@@ -211,7 +211,7 @@
             <h2 class="text-lg font-black text-slate-900 dark:text-white">Vista Previa de Impresión</h2>
             <div class="flex gap-3">
                 <button onclick="closePreview()" class="px-5 py-2.5 font-bold text-slate-600">Cerrar</button>
-                <button onclick="downloadPDF()" class="px-6 py-2.5 bg-brand-500 text-white font-bold rounded-2xl shadow-lg">📥 Descargar PDF</button>
+                <button onclick="downloadPDF()" class="px-6 py-2.5 bg-brand-500 text-white font-bold rounded-2xl shadow-lg">📥 Descargar PDF HD</button>
             </div>
         </div>
         <div class="flex-1 overflow-auto p-8 bg-slate-100 dark:bg-slate-950 flex justify-center">
@@ -451,8 +451,8 @@
                             <span class="step-number-label text-xs font-black uppercase text-brand-500">Paso</span>
                             ${canManage ? `
                                 <div class="flex gap-1">
-                                    <button type="button" onclick="moveStep(this, 'up')" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white transition-all" title="Subir Paso">▲ Subir</button>
-                                    <button type="button" onclick="moveStep(this, 'down')" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white transition-all" title="Bajar Paso">▼ Bajar</button>
+                                    <button type="button" onclick="moveStep(this, 'up')" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white transition-all">▲ Subir</button>
+                                    <button type="button" onclick="moveStep(this, 'down')" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white transition-all">▼ Bajar</button>
                                 </div>
                             ` : ''}
                         </div>
@@ -473,24 +473,18 @@
             updateStepNumbers();
         }
 
-        // Función para mover el paso hacia arriba o hacia abajo
         function moveStep(btn, direction) {
             const currentItem = btn.closest('.step-item');
             if (direction === 'up') {
                 const prevItem = currentItem.previousElementSibling;
-                if (prevItem) {
-                    currentItem.parentNode.insertBefore(currentItem, prevItem);
-                }
+                if (prevItem) currentItem.parentNode.insertBefore(currentItem, prevItem);
             } else if (direction === 'down') {
                 const nextItem = currentItem.nextElementSibling;
-                if (nextItem) {
-                    currentItem.parentNode.insertBefore(nextItem, currentItem);
-                }
+                if (nextItem) currentItem.parentNode.insertBefore(nextItem, currentItem);
             }
             updateStepNumbers();
         }
 
-        // Actualizar visualmente la numeración de los pasos después de moverlos o borrarlos
         function updateStepNumbers() {
             const steps = document.querySelectorAll('.step-item');
             steps.forEach((step, index) => {
@@ -540,7 +534,7 @@
                     <div style="margin-bottom: 25px; background: #f8fafc; border-left: 4px solid #3b82f6; padding: 15px; border-radius: 0 10px 10px 0;">
                         <h3 style="margin: 0 0 5px 0; font-size: 14px; font-weight: 900;">Paso ${i+1}: ${title || 'Sin título'}</h3>
                         <p style="margin: 0 0 10px 0; font-size: 12px; color: #334155;">${desc || ''}</p>
-                        ${img ? `<div style="text-align: center;"><img src="${img}" style="max-height: 180px; max-width: 100%; object-fit: contain; border-radius: 6px;" /></div>` : ''}
+                        ${img ? `<div style="text-align: center;"><img src="${img}" style="max-height: 220px; max-width: 100%; object-fit: contain; border-radius: 6px;" /></div>` : ''}
                     </div>
                 `;
             });
@@ -549,12 +543,17 @@
             document.getElementById('previewModal').classList.replace('hidden', 'flex');
         }
 
+        // DESCARGA PDF EN ALTA DEFINICIÓN (HD)
         function downloadPDF() {
             const element = document.getElementById('manualDocument');
-            html2pdf().from(element).set({
-                margin: 10, filename: 'Manual_Operativo.pdf', image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save();
+            const opt = {
+                margin: 10,
+                filename: 'Manual_Operativo_Ingram.pdf',
+                image: { type: 'png' }, // PNG sin pérdida de nitidez
+                html2canvas: { scale: 4, useCORS: true, letterRendering: true }, // Renderizado HD 4x
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
+            };
+            html2pdf().from(element).set(opt).save();
         }
 
         function closePreview() { document.getElementById('previewModal').classList.replace('flex', 'hidden'); }
