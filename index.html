@@ -220,9 +220,39 @@
     </div>
 
     <script>
-        let appData = JSON.parse(localStorage.getItem('warehouseManualsSystemV5')) || { 
-            areas: [], history: [], users: [{ id: 'admin_master', name: 'Administrador Maestro', username: 'admin', password: 'admin', role: 'admin', status: 'approved' }] 
-        };
+        // Función inteligente para buscar tus manuales creados anteriormente
+        function loadStoredData() {
+            const keys = [
+                'warehouseManualsSystemV5',
+                'warehouseManualsSystemV4',
+                'warehouseManualsSystemV3',
+                'warehouseManualsSystemV2',
+                'warehouseManualsSystem',
+                'warehouseManuals'
+            ];
+            for (let key of keys) {
+                const item = localStorage.getItem(key);
+                if (item) {
+                    try {
+                        const parsed = JSON.parse(item);
+                        if (parsed && (parsed.areas?.length > 0 || parsed.history?.length > 0)) {
+                            // Garantizar que tenga usuario administrador por defecto
+                            if (!parsed.users || parsed.users.length === 0) {
+                                parsed.users = [{ id: 'admin_master', name: 'Administrador Maestro', username: 'admin', password: 'admin', role: 'admin', status: 'approved' }];
+                            }
+                            return parsed;
+                        }
+                    } catch(e) {}
+                }
+            }
+            return { 
+                areas: [], 
+                history: [], 
+                users: [{ id: 'admin_master', name: 'Administrador Maestro', username: 'admin', password: 'admin', role: 'admin', status: 'approved' }] 
+            };
+        }
+
+        let appData = loadStoredData();
         let currentUser = null;
         let isRegistering = false;
         let isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -242,7 +272,9 @@
         }
 
         function saveData() {
+            // Guardar en todas las versiones comunes para nunca perder la información
             localStorage.setItem('warehouseManualsSystemV5', JSON.stringify(appData));
+            localStorage.setItem('warehouseManualsSystemV4', JSON.stringify(appData));
             renderAreas(); renderHistory(); renderUsers();
         }
 
@@ -549,8 +581,8 @@
             const opt = {
                 margin: 10,
                 filename: 'Manual_Operativo_Ingram.pdf',
-                image: { type: 'png' }, // PNG sin pérdida de nitidez
-                html2canvas: { scale: 4, useCORS: true, letterRendering: true }, // Renderizado HD 4x
+                image: { type: 'png' },
+                html2canvas: { scale: 4, useCORS: true, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
             };
             html2pdf().from(element).set(opt).save();
