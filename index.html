@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Manuales - Almacén</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            500: '#0055d4', // Azul corporativo
+                            500: '#0055d4',
                             600: '#0044aa',
                         }
                     }
@@ -22,44 +20,50 @@
         }
     </script>
     <style>
-        /* Estilos específicos para cuando se imprime o se exporta a PDF */
         @media print {
             .no-print { display: none !important; }
             .print-break-inside-avoid { page-break-inside: avoid; break-inside: avoid; }
-            .print-page-break { page-break-before: always; }
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
 
-    <div id="loginScreen" class="fixed inset-0 bg-slate-800 flex items-center justify-center z-50">
+    <!-- ==========================================
+         PANTALLA DE ACCESO (LOGIN / REGISTRO)
+         ========================================== -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
             <div class="flex justify-center mb-6">
                 <img src="logo.png" alt="Ingram Micro Logo" class="h-16 object-contain rounded" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white font-bold p-3 rounded-lg text-xl\'>INGRAM MICRO</div>'">
             </div>
             <h2 class="text-2xl font-bold text-center text-slate-900 mb-2">Portal de Manuales</h2>
-            <p class="text-center text-slate-500 mb-8 text-sm">Capacitación y Procesos Operativos de Almacén</p>
+            <p class="text-center text-slate-500 mb-6 text-sm">Control de Operaciones y Capacitación</p>
             
-            <form id="loginForm" class="space-y-5">
+            <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Correo Electrónico</label>
-                    <input type="email" id="emailInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" value="admin@almacen.com" required>
+                    <input type="email" id="emailInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" value="admin@almacen.com" required>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Contraseña</label>
-                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" value="123456" required>
+                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" value="123456" required>
                 </div>
                 <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
                     Iniciar Sesión
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
-                <p class="text-center text-xs text-slate-400 mt-4">Credenciales por defecto precargadas para acceso rápido.</p>
             </form>
+            <div class="mt-4 text-center">
+                <p class="text-xs text-slate-400">Admin por defecto: <b>admin@almacen.com</b> (Clave: 123456)</p>
+            </div>
         </div>
     </div>
 
+    <!-- ==========================================
+         APLICACIÓN PRINCIPAL
+         ========================================== -->
     <div id="appContainer" class="hidden flex flex-col h-screen">
         
+        <!-- HEADER -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
@@ -67,183 +71,242 @@
                         <img src="logo.png" alt="Ingram Micro" class="h-8 object-contain" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white text-xs font-bold px-2 py-1 rounded\'>INGRAM MICRO</div>'">
                         <span class="font-bold text-lg text-slate-800 border-l border-slate-300 pl-4">Gestor de Manuales</span>
                     </div>
+                    <!-- Pestañas de Navegación (Áreas vs Historial) -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="switchTab('areas')" id="tabBtnAreas" class="px-4 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors">Áreas Operativas</button>
+                        <button onclick="switchTab('history')" id="tabBtnHistory" class="px-4 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors">Historial de Cambios</button>
+                    </div>
                     <div class="flex items-center gap-4">
-                        <span class="text-sm text-slate-500 hidden sm:block">Operaciones de Almacén</span>
+                        <span id="userRoleBadge" class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full">ADMIN</span>
                         <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800 font-medium px-3 py-2 rounded hover:bg-red-50 transition-colors">Cerrar Sesión</button>
                     </div>
                 </div>
             </div>
         </header>
 
+        <!-- CONTENIDO DE PESTAÑAS -->
         <main class="flex-1 overflow-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
-            <div class="max-w-7xl mx-auto space-y-6">
+            <div class="max-w-7xl mx-auto">
                 
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h1 class="text-2xl font-bold text-slate-900">Áreas Operativas</h1>
-                        <p class="text-slate-500 text-sm">Gestiona los manuales de capacitación por departamento.</p>
+                <!-- VISTA 1: ÁREAS Y MANUALES -->
+                <div id="viewAreas" class="space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900">Áreas Operativas de Almacén</h1>
+                            <p class="text-slate-500 text-sm">Administra departamentos y diseña guías de capacitación paso a paso.</p>
+                        </div>
+                        <button onclick="openAreaModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Nueva Área
+                        </button>
                     </div>
-                    <button onclick="openAreaModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Nueva Área
-                    </button>
+                    <div id="areasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 </div>
 
-                <div id="areasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- VISTA 2: HISTORIAL DE CAMBIOS (AUDITORÍA) -->
+                <div id="viewHistory" class="space-y-6 hidden">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Historial de Cambios y Auditoría</h1>
+                        <p class="text-slate-500 text-sm">Registro detallado de todas las modificaciones realizadas en los manuales.</p>
                     </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    <th class="p-4">Fecha y Hora</th>
+                                    <th class="p-4">Usuario</th>
+                                    <th class="p-4">Acción Realizada</th>
+                                    <th class="p-4">Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Se llena por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
 
+    <!-- MODALES Y CONSTRUCTOR (Mismo funcionamiento optimizado) -->
     <div id="areaModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-40 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="font-bold text-lg text-slate-800" id="areaModalTitle">Nueva Área</h3>
-                <button onclick="closeAreaModal()" class="text-slate-400 hover:text-slate-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="closeAreaModal()" class="text-slate-400 hover:text-slate-600">✕</button>
             </div>
             <div class="p-6 space-y-4">
                 <input type="hidden" id="areaId">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Área</label>
-                    <input type="text" id="areaName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none" placeholder="Ej. Recibo, Surtido, Inventarios...">
+                    <input type="text" id="areaName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. Recibo, Embarques...">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Descripción Breve</label>
-                    <textarea id="areaDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none" placeholder="Descripción de las actividades del área..."></textarea>
+                    <textarea id="areaDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Breve descripción..."></textarea>
                 </div>
             </div>
             <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                <button onclick="closeAreaModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-200 font-medium rounded-lg transition-colors">Cancelar</button>
-                <button onclick="saveArea()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors shadow-sm">Guardar Área</button>
+                <button onclick="closeAreaModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-200 font-medium rounded-lg">Cancelar</button>
+                <button onclick="saveArea()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg shadow-sm">Guardar Área</button>
             </div>
         </div>
     </div>
 
+    <!-- CONSTRUCTOR DE PROCESOS -->
     <div id="processBuilder" class="fixed inset-0 bg-slate-50 hidden flex-col z-40">
         <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
-                <button onclick="closeProcessBuilder()" class="text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 p-2 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                </button>
+                <button onclick="closeProcessBuilder()" class="text-slate-500 hover:text-slate-800 bg-slate-100 p-2 rounded-lg">← Volver</button>
                 <h2 class="font-bold text-xl text-slate-800" id="builderAreaName">Constructor de Proceso</h2>
             </div>
-            <button onclick="previewManual()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                Vista Previa
+            <button onclick="previewManual()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm flex items-center gap-2">
+                Vista Previa y PDF
             </button>
         </header>
-
         <div class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
             <div class="max-w-4xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Información del Proceso</h3>
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Información General</h3>
                     <input type="hidden" id="currentAreaId">
                     <input type="hidden" id="currentProcessId">
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Proceso <span class="text-red-500">*</span></label>
-                            <input type="text" id="procName" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-lg font-medium" placeholder="Ej. Recepción de Mercancía Proveedor Local">
+                            <input type="text" id="procName" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none text-lg font-medium" placeholder="Ej. Recibo de Tarimas">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Descripción General</label>
-                                <textarea id="procDesc" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Breve resumen del proceso..."></textarea>
+                                <textarea id="procDesc" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Objetivo de Capacitación</label>
-                                <textarea id="procObj" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Al finalizar, el empleado será capaz de..."></textarea>
+                                <textarea id="procObj" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-slate-800">Pasos del Procedimiento</h3>
-                        <button onclick="addStep()" class="text-brand-600 hover:text-brand-800 font-medium flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            Añadir Paso
-                        </button>
+                        <button onclick="addStep()" class="text-brand-600 font-medium flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg">+ Añadir Paso</button>
                     </div>
-                    <div id="stepsContainer" class="space-y-4">
-                        </div>
+                    <div id="stepsContainer" class="space-y-4"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- VISTA PREVIA MODAL -->
     <div id="previewModal" class="fixed inset-0 bg-slate-900/80 hidden flex-col z-50 backdrop-blur-sm">
         <div class="bg-white px-6 py-4 flex justify-between items-center shadow-md">
             <h2 class="text-xl font-bold text-slate-800">Vista Previa del Manual</h2>
             <div class="flex gap-3">
-                <button onclick="closePreview()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 font-medium rounded-lg transition-colors">Volver a Edición</button>
-                <button onclick="exportPDF()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Descargar PDF
-                </button>
+                <button onclick="closePreview()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Cerrar</button>
+                <button onclick="window.print()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm">Imprimir / Guardar PDF</button>
             </div>
         </div>
-        
         <div class="flex-1 overflow-auto p-4 sm:p-8">
-            <div id="manualDocument" class="bg-white max-w-4xl mx-auto shadow-2xl min-h-[1056px] (Tamaño Carta aprox) relative">
-                </div>
+            <div id="manualDocument" class="bg-white max-w-4xl mx-auto shadow-2xl min-h-[1056px] p-8"></div>
         </div>
     </div>
 
+    <!-- SCRIPT DE LÓGICA -->
     <script>
-        // --- 1. GESTIÓN DE DATOS LOCALES (LocalStorage) ---
-        // Inicializamos los datos si no existen en el navegador
-        let appData = JSON.parse(localStorage.getItem('warehouseManuals')) || {
-            areas: []
-        };
+        let appData = JSON.parse(localStorage.getItem('warehouseManuals')) || { areas: [], history: [] };
+        let currentUser = null;
 
         function saveData() {
             localStorage.setItem('warehouseManuals', JSON.stringify(appData));
             renderAreas();
+            renderHistory();
         }
 
-        // Generador de IDs únicos
+        function logAction(action, detail) {
+            const now = new Date().toLocaleString('es-MX');
+            appData.history.unshift({
+                date: now,
+                user: currentUser || 'Admin',
+                action: action,
+                detail: detail
+            });
+            saveData();
+        }
+
         const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
 
-        // --- 2. SISTEMA DE LOGIN BÁSICO ---
+        // Login
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Simulación rápida: si hace clic, entra. 
-            // En un sistema real aquí validarías con una base de datos.
+            currentUser = document.getElementById('emailInput').value;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.remove('hidden');
             renderAreas();
+            renderHistory();
         });
 
         function logout() {
             document.getElementById('appContainer').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('loginScreen').classList.add('flex');
         }
 
-        // --- 3. GESTIÓN DE ÁREAS (Tarjetas del Dashboard) ---
+        // Pestañas
+        function switchTab(tab) {
+            if (tab === 'areas') {
+                document.getElementById('viewAreas').classList.remove('hidden');
+                document.getElementById('viewHistory').classList.add('hidden');
+                document.getElementById('tabBtnAreas').className = "px-4 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors";
+                document.getElementById('tabBtnHistory').className = "px-4 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors";
+            } else {
+                document.getElementById('viewAreas').classList.add('hidden');
+                document.getElementById('viewHistory').classList.remove('hidden');
+                document.getElementById('tabBtnHistory').className = "px-4 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors";
+                document.getElementById('tabBtnAreas').className = "px-4 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors";
+            }
+        }
+
+        // Historial Render
+        function renderHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            if (!appData.history || appData.history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin cambios registrados aún.</td></tr>`;
+                return;
+            }
+            appData.history.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-500 whitespace-nowrap">${item.date}</td>
+                    <td class="p-4 font-medium text-slate-800">${item.user}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">${item.action}</span></td>
+                    <td class="p-4 text-slate-600">${item.detail}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render Áreas
         function renderAreas() {
             const grid = document.getElementById('areasGrid');
             grid.innerHTML = '';
-
             appData.areas.forEach(area => {
-                const processesCount = area.processes ? area.processes.length : 0;
+                const count = area.processes ? area.processes.length : 0;
                 const card = document.createElement('div');
                 card.className = 'bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow group relative';
                 card.innerHTML = `
                     <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="editArea('${area.id}')" class="text-slate-400 hover:text-brand-600" title="Editar Área"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
-                        <button onclick="deleteArea('${area.id}')" class="text-slate-400 hover:text-red-600" title="Eliminar Área"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        <button onclick="editArea('${area.id}')" class="text-slate-400 hover:text-brand-600">✏️</button>
+                        <button onclick="deleteArea('${area.id}')" class="text-slate-400 hover:text-red-600">🗑️</button>
                     </div>
-                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    </div>
+                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center mb-4 font-bold text-xl">📁</div>
                     <h3 class="text-lg font-bold text-slate-800 mb-1">${area.name}</h3>
                     <p class="text-sm text-slate-500 mb-4 line-clamp-2">${area.description || 'Sin descripción.'}</p>
                     <div class="border-t border-slate-100 pt-4 flex justify-between items-center">
-                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">${processesCount} Procesos</span>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">${count} Procesos</span>
                         <button onclick="openProcessList('${area.id}')" class="text-brand-600 text-sm font-medium hover:text-brand-800">Gestionar &rarr;</button>
                     </div>
                 `;
@@ -251,7 +314,6 @@
             });
         }
 
-        // Funciones del Modal de Áreas
         function openAreaModal() {
             document.getElementById('areaId').value = '';
             document.getElementById('areaName').value = '';
@@ -270,24 +332,18 @@
             const id = document.getElementById('areaId').value;
             const name = document.getElementById('areaName').value.trim();
             const desc = document.getElementById('areaDesc').value.trim();
-
-            if (!name) return alert("El nombre del área es requerido.");
+            if (!name) return alert("El nombre es requerido.");
 
             if (id) {
-                // Editar área existente
                 const area = appData.areas.find(a => a.id === id);
                 if (area) {
                     area.name = name;
                     area.description = desc;
+                    logAction('EDITAR ÁREA', `Se actualizó el área: ${name}`);
                 }
             } else {
-                // Crear nueva área
-                appData.areas.push({
-                    id: generateId(),
-                    name: name,
-                    description: desc,
-                    processes: []
-                });
+                appData.areas.push({ id: generateId(), name, description: desc, processes: [] });
+                logAction('CREAR ÁREA', `Se creó la nueva área: ${name}`);
             }
             saveData();
             closeAreaModal();
@@ -306,43 +362,35 @@
         }
 
         function deleteArea(id) {
-            if (confirm("¿Estás seguro de eliminar esta área y todos sus manuales?")) {
+            if (confirm("¿Estás seguro de eliminar esta área?")) {
+                const area = appData.areas.find(a => a.id === id);
                 appData.areas = appData.areas.filter(a => a.id !== id);
+                logAction('ELIMINAR ÁREA', `Se eliminó el área: ${area ? area.name : id}`);
                 saveData();
             }
         }
 
-        // --- 4. CONSTRUCTOR DE PROCESOS (Manuales) ---
-        // Para simplificar, al entrar a gestionar un área, crearemos/editaremos un proceso principal directamente.
         function openProcessList(areaId) {
             const area = appData.areas.find(a => a.id === areaId);
             if (!area) return;
-            
-            // Si no tiene procesos, inicializamos uno vacío
             if (!area.processes) area.processes = [];
-            if (area.processes.length === 0) {
-                area.processes.push({ id: generateId(), name: '', description: '', objective: '', steps: [] });
-            }
+            if (area.processes.length === 0) area.processes.push({ id: generateId(), name: '', description: '', objective: '', steps: [] });
 
-            const proc = area.processes[0]; // Trabajaremos con el primer proceso por ahora
-            
+            const proc = area.processes[0];
             document.getElementById('currentAreaId').value = area.id;
             document.getElementById('currentProcessId').value = proc.id;
             document.getElementById('builderAreaName').innerText = `Manual: ${area.name}`;
-            
             document.getElementById('procName').value = proc.name;
             document.getElementById('procDesc').value = proc.description;
             document.getElementById('procObj').value = proc.objective;
 
             renderStepsList(proc.steps);
-
             document.getElementById('appContainer').classList.add('hidden');
             document.getElementById('processBuilder').classList.remove('hidden');
             document.getElementById('processBuilder').classList.add('flex');
         }
 
         function closeProcessBuilder() {
-            // Guardar cambios automáticamente al salir
             saveCurrentProcess();
             document.getElementById('processBuilder').classList.add('hidden');
             document.getElementById('processBuilder').classList.remove('flex');
@@ -353,191 +401,97 @@
         function saveCurrentProcess() {
             const areaId = document.getElementById('currentAreaId').value;
             const procId = document.getElementById('currentProcessId').value;
-            
             const area = appData.areas.find(a => a.id === areaId);
             if (!area) return;
-
             const procIndex = area.processes.findIndex(p => p.id === procId);
             if (procIndex === -1) return;
 
-            // Recopilar pasos actuales de la interfaz
             const stepsDivs = document.querySelectorAll('.step-item');
             const steps = [];
             stepsDivs.forEach((div, index) => {
-                const title = div.querySelector('.step-title').value;
-                const desc = div.querySelector('.step-desc').value;
-                const imgBase64 = div.querySelector('.step-img-data').value;
                 steps.push({
                     number: index + 1,
-                    title: title,
-                    description: desc,
-                    image: imgBase64
+                    title: div.querySelector('.step-title').value,
+                    description: div.querySelector('.step-desc').value,
+                    image: div.querySelector('.step-img-data').value
                 });
             });
 
+            const pName = document.getElementById('procName').value;
             area.processes[procIndex] = {
                 id: procId,
-                name: document.getElementById('procName').value,
+                name: pName,
                 description: document.getElementById('procDesc').value,
                 objective: document.getElementById('procObj').value,
                 steps: steps
             };
+            logAction('ACTUALIZAR MANUAL', `Se modificó el proceso "${pName || 'Sin Título'}" en el área ${area.name}`);
             saveData();
         }
 
-        // --- 5. GESTIÓN DE PASOS DEL MANUAL ---
         function renderStepsList(steps) {
             const container = document.getElementById('stepsContainer');
             container.innerHTML = '';
-            steps.forEach(step => addStepToUI(step));
-            if(steps.length === 0) addStep(); // Agregar un paso vacío por defecto
+            steps.forEach(s => addStepToUI(s));
+            if (steps.length === 0) addStep();
         }
 
-        function addStep() {
-            addStepToUI({ title: '', description: '', image: '' });
-        }
+        function addStep() { addStepToUI({ title: '', description: '', image: '' }); }
 
-        function addStepToUI(stepData) {
+        function addStepToUI(data) {
             const container = document.getElementById('stepsContainer');
-            const stepNum = container.children.length + 1;
-            
             const stepDiv = document.createElement('div');
             stepDiv.className = 'step-item bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm relative';
-            
-            // Verificamos si hay imagen para mostrar la vista previa o esconderla
-            const imgPreviewStyle = stepData.image ? '' : 'display: none;';
-            const imgPreviewSrc = stepData.image ? stepData.image : '';
-
+            const imgStyle = data.image ? '' : 'display: none;';
+            const phStyle = data.image ? 'display: none;' : '';
             stepDiv.innerHTML = `
-                <div class="absolute -left-3 top-6 bg-brand-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-md border-2 border-white step-number-badge">
-                    ${stepNum}
-                </div>
-                <div class="ml-4 flex flex-col md:flex-row gap-6">
+                <div class="flex flex-col md:flex-row gap-6">
                     <div class="flex-1 space-y-4">
-                        <div>
-                            <input type="text" class="step-title w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-800 focus:border-brand-500 outline-none" placeholder="Título del paso (Ej. Escanear código de barras)" value="${stepData.title || ''}">
-                        </div>
-                        <div>
-                            <textarea rows="4" class="step-desc w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-600 focus:border-brand-500 outline-none" placeholder="Instrucción detallada...">${stepData.description || ''}</textarea>
-                        </div>
+                        <input type="text" class="step-title w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-800 outline-none" placeholder="Título del paso" value="${data.title || ''}">
+                        <textarea rows="3" class="step-desc w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-600 outline-none" placeholder="Instrucción detallada...">${data.description || ''}</textarea>
                     </div>
                     <div class="w-full md:w-1/3 flex flex-col gap-2">
-                        <label class="block text-sm font-medium text-slate-700">Imagen Ilustrativa</label>
-                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center hover:bg-slate-50 transition-colors relative h-32 flex flex-col items-center justify-center cursor-pointer" onclick="this.querySelector('input[type=file]').click()">
-                            <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(this)">
-                            <img src="${imgPreviewSrc}" class="step-img-preview absolute inset-0 w-full h-full object-contain p-1 rounded-lg bg-white" style="${imgPreviewStyle}">
-                            <div class="step-img-placeholder" style="${stepData.image ? 'display: none;' : ''}">
-                                <svg class="mx-auto h-8 w-8 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                <span class="mt-1 block text-xs text-slate-500">Subir imagen</span>
-                            </div>
-                            <input type="hidden" class="step-img-data" value="${stepData.image || ''}">
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center relative h-28 flex flex-col items-center justify-center cursor-pointer" onclick="this.querySelector('input').click()">
+                            <input type="file" class="hidden" accept="image/*" onchange="handleImg(this)">
+                            <img src="${data.image || ''}" class="step-img-preview absolute inset-0 w-full h-full object-contain p-1 bg-white" style="${imgStyle}">
+                            <span class="step-img-placeholder text-xs text-slate-400" style="${phStyle}">Subir Imagen</span>
+                            <input type="hidden" class="step-img-data" value="${data.image || ''}">
                         </div>
-                        <button onclick="removeStep(this)" class="text-xs text-red-500 hover:text-red-700 font-medium mt-auto text-right">Eliminar Paso</button>
+                        <button onclick="this.closest('.step-item').remove()" class="text-xs text-red-500 font-medium text-right">Eliminar Paso</button>
                     </div>
                 </div>
             `;
             container.appendChild(stepDiv);
         }
 
-        // Convertir imagen subida a Base64 para guardarla localmente
-        function handleImageUpload(input) {
+        function handleImg(input) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const base64Str = e.target.result;
-                    const wrapper = input.parentElement;
-                    wrapper.querySelector('.step-img-preview').src = base64Str;
-                    wrapper.querySelector('.step-img-preview').style.display = 'block';
-                    wrapper.querySelector('.step-img-placeholder').style.display = 'none';
-                    wrapper.querySelector('.step-img-data').value = base64Str;
+                reader.onload = e => {
+                    const wrap = input.parentElement;
+                    wrap.querySelector('.step-img-preview').src = e.target.result;
+                    wrap.querySelector('.step-img-preview').style.display = 'block';
+                    wrap.querySelector('.step-img-placeholder').style.display = 'none';
+                    wrap.querySelector('.step-img-data').value = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function removeStep(btn) {
-            btn.closest('.step-item').remove();
-            // Re-enumerar pasos
-            const badges = document.querySelectorAll('.step-number-badge');
-            badges.forEach((badge, index) => {
-                badge.innerText = index + 1;
-            });
-        }
-
-        // --- 6. VISTA PREVIA Y RENDERIZADO DEL DOCUMENTO ---
         function previewManual() {
-            saveCurrentProcess(); // Guardar antes de visualizar
-            
-            const procName = document.getElementById('procName').value || 'Procedimiento Sin Título';
-            const procDesc = document.getElementById('procDesc').value;
-            const procObj = document.getElementById('procObj').value;
-            const areaName = document.getElementById('builderAreaName').innerText.replace('Manual: ', '');
-            
+            saveCurrentProcess();
+            const procName = document.getElementById('procName').value || 'Procedimiento';
             const docContainer = document.getElementById('manualDocument');
-            
-            let dateStr = new Date().toLocaleDateString('es-MX');
-
-            // Construcción del HTML para el formato de documento tipo guía
-            let htmlDoc = `
-                <div class="p-8 sm:p-12 text-slate-900 font-sans">
-                    <div class="flex justify-between items-start border-b-2 border-brand-500 pb-6 mb-8">
-                        <div>
-                            <img src="logo.png" alt="Ingram Micro" class="h-10 object-contain mb-2" onerror="this.outerHTML='<div class=\\'bg-brand-500 text-white text-sm font-bold px-3 py-1 rounded\\'>INGRAM MICRO</div>'">
-                            <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Manual de Operaciones</p>
-                            <p class="text-sm font-medium text-brand-600">Área: ${areaName}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs text-slate-500">Fecha de actualización</p>
-                            <p class="text-sm font-bold">${dateStr}</p>
-                            <p class="text-xs text-slate-400 mt-1">Uso Interno</p>
-                        </div>
-                    </div>
-
-                    <h1 class="text-3xl font-bold mb-4">${procName}</h1>
-                    
-                    <div class="bg-slate-50 p-4 rounded-lg mb-8 border border-slate-200 print-break-inside-avoid">
-                        ${procDesc ? `<div class="mb-3"><h4 class="font-bold text-xs uppercase text-slate-500 mb-1">Descripción</h4><p class="text-sm">${procDesc}</p></div>` : ''}
-                        ${procObj ? `<div><h4 class="font-bold text-xs uppercase text-slate-500 mb-1">Objetivo</h4><p class="text-sm">${procObj}</p></div>` : ''}
-                    </div>
-
-                    <div class="space-y-8">
-            `;
-
-            // Extraer pasos del formulario para renderizarlos
-            const stepsDivs = document.querySelectorAll('.step-item');
-            stepsDivs.forEach((div, index) => {
-                const title = div.querySelector('.step-title').value;
-                const desc = div.querySelector('.step-desc').value;
+            let html = `<h1 class="text-2xl font-bold mb-4">${procName}</h1><div class="space-y-4">`;
+            document.querySelectorAll('.step-item').forEach((div, i) => {
+                const t = div.querySelector('.step-title').value;
+                const d = div.querySelector('.step-desc').value;
                 const img = div.querySelector('.step-img-data').value;
-                
-                // Si el paso tiene imagen, estructuramos para mostrar texto e imagen.
-                // Usamos 'object-contain' en la imagen para que mantenga sus proporciones sin deformarse sin importar su tamaño
-                htmlDoc += `
-                    <div class="flex gap-4 print-break-inside-avoid border-l-4 border-slate-200 pl-4 py-2">
-                        <div class="w-8 h-8 rounded-full bg-brand-50 text-brand-600 font-bold flex items-center justify-center shrink-0">
-                            ${index + 1}
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-lg mb-1">${title || `Paso ${index + 1}`}</h3>
-                            <p class="text-slate-600 whitespace-pre-line mb-4">${desc}</p>
-                            ${img ? `<div class="mt-3 bg-slate-50 p-2 rounded-lg border border-slate-200 inline-block w-full max-w-sm lg:w-96"><img src="${img}" class="w-full h-auto object-contain rounded" style="max-height: 250px;" /></div>` : ''}
-                        </div>
-                    </div>
-                `;
+                html += `<div class="border-l-4 border-brand-500 pl-4 py-2"><h3 class="font-bold">Paso ${i+1}: ${t}</h3><p class="text-sm text-slate-600 mb-2">${d}</p>${img ? `<img src="${img}" class="max-h-48 object-contain rounded" />` : ''}</div>`;
             });
-
-            htmlDoc += `
-                    </div>
-                    
-                    <div class="mt-16 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
-                        Documento generado desde el Portal de Manuales de Almacén.
-                    </div>
-                </div>
-            `;
-
-            docContainer.innerHTML = htmlDoc;
-            
+            html += `</div>`;
+            docContainer.innerHTML = html;
             document.getElementById('previewModal').classList.remove('hidden');
             document.getElementById('previewModal').classList.add('flex');
         }
@@ -545,20 +499,6 @@
         function closePreview() {
             document.getElementById('previewModal').classList.add('hidden');
             document.getElementById('previewModal').classList.remove('flex');
-        }
-
-        // --- 7. EXPORTACIÓN A PDF ---
-        // Utiliza la ventana de impresión del navegador que nativamente permite "Guardar como PDF" manteniendo la calidad y vectores
-        function exportPDF() {
-            // Ocultamos elementos de UI que no deben imprimirse temporalmente
-            const previewModal = document.getElementById('previewModal');
-            const documentDiv = document.getElementById('manualDocument');
-            
-            // Respaldamos los estilos
-            const originalBodyDisplay = document.body.style.display;
-            
-            // Preparamos para imprimir
-            window.print();
         }
     </script>
 </body>
