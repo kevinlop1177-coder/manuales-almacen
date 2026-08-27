@@ -19,41 +19,43 @@
             }
         }
     </script>
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-            .print-break-inside-avoid { page-break-inside: avoid; break-inside: avoid; }
-        }
-    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
 
     <!-- ==========================================
          PANTALLA DE ACCESO (LOGIN / REGISTRO)
          ========================================== -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+    <div id="authScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
             <div class="flex justify-center mb-6">
                 <img src="logo.png" alt="Ingram Micro Logo" class="h-16 object-contain rounded" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white font-bold p-3 rounded-lg text-xl\'>INGRAM MICRO</div>'">
             </div>
-            <h2 class="text-2xl font-bold text-center text-slate-900 mb-2">Portal de Manuales</h2>
-            <p class="text-center text-slate-500 mb-6 text-sm">Control de Operaciones y Capacitación</p>
             
-            <form id="loginForm" class="space-y-4">
+            <h2 id="authTitle" class="text-2xl font-bold text-center text-slate-900 mb-2">Iniciar Sesión</h2>
+            <p id="authSubtitle" class="text-center text-slate-500 mb-6 text-sm">Portal de Manuales y Procesos de Almacén</p>
+            
+            <form id="authForm" class="space-y-4">
+                <div id="nameFieldContainer" class="hidden">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Nombre Completo</label>
+                    <input type="text" id="regFullNameInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Tu Nombre y Apellido">
+                </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Correo Electrónico</label>
-                    <input type="email" id="emailInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" value="admin@almacen.com" required>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Nombre de Usuario</label>
+                    <input type="text" id="usernameInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. kevin_almacen" required>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Contraseña</label>
-                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" value="123456" required>
+                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
-                    Iniciar Sesión
+                <button type="submit" id="authSubmitBtn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
+                    Ingresar
                 </button>
             </form>
-            <div class="mt-4 text-center">
-                <p class="text-xs text-slate-400">Admin por defecto: <b>admin@almacen.com</b> (Clave: 123456)</p>
+
+            <div class="mt-6 text-center border-t border-slate-100 pt-4">
+                <p id="authToggleText" class="text-sm text-slate-600">
+                    ¿No tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline">Regístrate aquí</button>
+                </p>
             </div>
         </div>
     </div>
@@ -71,20 +73,28 @@
                         <img src="logo.png" alt="Ingram Micro" class="h-8 object-contain" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white text-xs font-bold px-2 py-1 rounded\'>INGRAM MICRO</div>'">
                         <span class="font-bold text-lg text-slate-800 border-l border-slate-300 pl-4">Gestor de Manuales</span>
                     </div>
-                    <!-- Pestañas de Navegación (Áreas vs Historial) -->
+                    
+                    <!-- Pestañas de Navegación -->
                     <div class="flex items-center gap-2">
-                        <button onclick="switchTab('areas')" id="tabBtnAreas" class="px-4 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors">Áreas Operativas</button>
-                        <button onclick="switchTab('history')" id="tabBtnHistory" class="px-4 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors">Historial de Cambios</button>
+                        <button onclick="switchTab('areas')" id="tabBtnAreas" class="px-3 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors">Áreas Operativas</button>
+                        <button onclick="switchTab('history')" id="tabBtnHistory" class="px-3 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors">Historial</button>
+                        <button onclick="switchTab('users')" id="tabBtnUsers" class="hidden px-3 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors relative">
+                            Autorizar Usuarios <span id="pendingBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
+                        </button>
                     </div>
+
                     <div class="flex items-center gap-4">
-                        <span id="userRoleBadge" class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full">ADMIN</span>
-                        <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800 font-medium px-3 py-2 rounded hover:bg-red-50 transition-colors">Cerrar Sesión</button>
+                        <div class="text-right">
+                            <span id="userNameDisplay" class="block text-xs font-bold text-slate-800">Usuario</span>
+                            <span id="userRoleBadge" class="text-[10px] uppercase font-bold text-slate-400">Rol</span>
+                        </div>
+                        <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800 font-medium px-3 py-2 rounded hover:bg-red-50 transition-colors">Salir</button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- CONTENIDO DE PESTAÑAS -->
+        <!-- CONTENIDO -->
         <main class="flex-1 overflow-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
             <div class="max-w-7xl mx-auto">
                 
@@ -96,18 +106,17 @@
                             <p class="text-slate-500 text-sm">Administra departamentos y diseña guías de capacitación paso a paso.</p>
                         </div>
                         <button onclick="openAreaModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            Nueva Área
+                            + Nueva Área
                         </button>
                     </div>
                     <div id="areasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 </div>
 
-                <!-- VISTA 2: HISTORIAL DE CAMBIOS (AUDITORÍA) -->
+                <!-- VISTA 2: HISTORIAL -->
                 <div id="viewHistory" class="space-y-6 hidden">
                     <div>
                         <h1 class="text-2xl font-bold text-slate-900">Historial de Cambios y Auditoría</h1>
-                        <p class="text-slate-500 text-sm">Registro detallado de todas las modificaciones realizadas en los manuales.</p>
+                        <p class="text-slate-500 text-sm">Registro exacto de qué usuario realizó cada cambio.</p>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <table class="w-full text-left border-collapse">
@@ -115,13 +124,32 @@
                                 <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     <th class="p-4">Fecha y Hora</th>
                                     <th class="p-4">Usuario</th>
-                                    <th class="p-4">Acción Realizada</th>
+                                    <th class="p-4">Acción</th>
                                     <th class="p-4">Detalle</th>
                                 </tr>
                             </thead>
-                            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-sm">
-                                <!-- Se llena por JS -->
-                            </tbody>
+                            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VISTA 3: GESTIÓN Y AUTORIZACIÓN DE USUARIOS (SOLO ADMIN) -->
+                <div id="viewUsers" class="space-y-6 hidden">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">Autorización de Cuentas Nuevas</h1>
+                        <p class="text-slate-500 text-sm">Aprueba o rechaza el acceso de los colaboradores que intentan ingresar a la app.</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    <th class="p-4">Nombre Completo</th>
+                                    <th class="p-4">Usuario</th>
+                                    <th class="p-4">Estado</th>
+                                    <th class="p-4 text-right">Acciones de Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -130,7 +158,7 @@
         </main>
     </div>
 
-    <!-- MODALES Y CONSTRUCTOR (Mismo funcionamiento optimizado) -->
+    <!-- MODAL ÁREA -->
     <div id="areaModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-40 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -141,58 +169,55 @@
                 <input type="hidden" id="areaId">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Área</label>
-                    <input type="text" id="areaName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. Recibo, Embarques...">
+                    <input type="text" id="areaName" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none" placeholder="Ej. Recibo...">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Descripción Breve</label>
-                    <textarea id="areaDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Breve descripción..."></textarea>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                    <textarea id="areaDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
                 </div>
             </div>
             <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                <button onclick="closeAreaModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-200 font-medium rounded-lg">Cancelar</button>
-                <button onclick="saveArea()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg shadow-sm">Guardar Área</button>
+                <button onclick="closeAreaModal()" class="px-4 py-2 text-slate-600 font-medium rounded-lg">Cancelar</button>
+                <button onclick="saveArea()" class="px-4 py-2 bg-brand-500 text-white font-medium rounded-lg shadow-sm">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- CONSTRUCTOR DE PROCESOS -->
+    <!-- CONSTRUCTOR -->
     <div id="processBuilder" class="fixed inset-0 bg-slate-50 hidden flex-col z-40">
         <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
-                <button onclick="closeProcessBuilder()" class="text-slate-500 hover:text-slate-800 bg-slate-100 p-2 rounded-lg">← Volver</button>
-                <h2 class="font-bold text-xl text-slate-800" id="builderAreaName">Constructor de Proceso</h2>
+                <button onclick="closeProcessBuilder()" class="text-slate-500 bg-slate-100 px-3 py-2 rounded-lg font-medium">← Volver</button>
+                <h2 class="font-bold text-xl text-slate-800" id="builderAreaName">Constructor</h2>
             </div>
-            <button onclick="previewManual()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm flex items-center gap-2">
-                Vista Previa y PDF
-            </button>
+            <button onclick="previewManual()" class="bg-brand-500 text-white px-4 py-2 rounded-lg font-medium">Vista Previa / PDF</button>
         </header>
-        <div class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+        <div class="flex-1 overflow-auto p-4 sm:p-8">
             <div class="max-w-4xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Información General</h3>
                     <input type="hidden" id="currentAreaId">
                     <input type="hidden" id="currentProcessId">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Proceso <span class="text-red-500">*</span></label>
-                            <input type="text" id="procName" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none text-lg font-medium" placeholder="Ej. Recibo de Tarimas">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Proceso</label>
+                            <input type="text" id="procName" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-lg font-medium outline-none">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Descripción General</label>
-                                <textarea id="procDesc" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                                <textarea id="procDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Objetivo de Capacitación</label>
-                                <textarea id="procObj" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Objetivo</label>
+                                <textarea id="procObj" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Pasos del Procedimiento</h3>
-                        <button onclick="addStep()" class="text-brand-600 font-medium flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg">+ Añadir Paso</button>
+                        <h3 class="text-lg font-bold text-slate-800">Pasos</h3>
+                        <button onclick="addStep()" class="text-brand-600 font-medium bg-brand-50 px-3 py-1.5 rounded-lg">+ Añadir Paso</button>
                     </div>
                     <div id="stepsContainer" class="space-y-4"></div>
                 </div>
@@ -203,101 +228,161 @@
     <!-- VISTA PREVIA MODAL -->
     <div id="previewModal" class="fixed inset-0 bg-slate-900/80 hidden flex-col z-50 backdrop-blur-sm">
         <div class="bg-white px-6 py-4 flex justify-between items-center shadow-md">
-            <h2 class="text-xl font-bold text-slate-800">Vista Previa del Manual</h2>
+            <h2 class="text-xl font-bold text-slate-800">Vista Previa</h2>
             <div class="flex gap-3">
-                <button onclick="closePreview()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Cerrar</button>
-                <button onclick="window.print()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm">Imprimir / Guardar PDF</button>
+                <button onclick="closePreview()" class="px-4 py-2 text-slate-600 rounded-lg">Cerrar</button>
+                <button onclick="window.print()" class="px-4 py-2 bg-green-600 text-white rounded-lg">Imprimir / PDF</button>
             </div>
         </div>
-        <div class="flex-1 overflow-auto p-4 sm:p-8">
-            <div id="manualDocument" class="bg-white max-w-4xl mx-auto shadow-2xl min-h-[1056px] p-8"></div>
-        </div>
+        <div class="flex-1 overflow-auto p-8"><div id="manualDocument" class="bg-white max-w-4xl mx-auto shadow-2xl p-8 min-h-[1056px]"></div></div>
     </div>
 
-    <!-- SCRIPT DE LÓGICA -->
+    <!-- LÓGICA -->
     <script>
-        let appData = JSON.parse(localStorage.getItem('warehouseManuals')) || { areas: [], history: [] };
+        let appData = JSON.parse(localStorage.getItem('warehouseManualsSystemV3')) || { 
+            areas: [], 
+            history: [], 
+            users: [{ id: 'admin_master', name: 'Administrador Maestro', username: 'admin', password: 'admin', role: 'admin', status: 'approved' }] 
+        };
         let currentUser = null;
+        let isRegistering = false;
 
         function saveData() {
-            localStorage.setItem('warehouseManuals', JSON.stringify(appData));
+            localStorage.setItem('warehouseManualsSystemV3', JSON.stringify(appData));
             renderAreas();
             renderHistory();
+            renderUsers();
         }
 
         function logAction(action, detail) {
-            const now = new Date().toLocaleString('es-MX');
             appData.history.unshift({
-                date: now,
-                user: currentUser || 'Admin',
-                action: action,
-                detail: detail
+                date: new Date().toLocaleString('es-MX'),
+                user: currentUser ? currentUser.name : 'Sistema',
+                action,
+                detail
             });
             saveData();
         }
 
         const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
 
-        // Login
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        function toggleAuthMode() {
+            isRegistering = !isRegistering;
+            document.getElementById('authTitle').innerText = isRegistering ? "Registro de Colaborador" : "Iniciar Sesión";
+            document.getElementById('authSubtitle').innerText = isRegistering ? "Crea tu usuario; requerirá autorización del administrador" : "Portal de Manuales y Procesos";
+            document.getElementById('authSubmitBtn').innerText = isRegistering ? "Solicitar Registro" : "Ingresar";
+            document.getElementById('nameFieldContainer').classList.toggle('hidden', !isRegistering);
+            document.getElementById('regFullNameInput').required = isRegistering;
+            document.getElementById('authToggleText').innerHTML = isRegistering ? 
+                '¿Ya tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline">Inicia Sesión</button>' : 
+                '¿No tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline">Regístrate aquí</button>';
+        }
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            currentUser = document.getElementById('emailInput').value;
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            renderAreas();
-            renderHistory();
+            const username = document.getElementById('usernameInput').value.trim().toLowerCase();
+            const password = document.getElementById('passwordInput').value.trim();
+
+            if (isRegistering) {
+                const name = document.getElementById('regFullNameInput').value.trim();
+                if (appData.users.some(u => u.username === username)) return alert("Este nombre de usuario ya está en uso. Elige otro.");
+                
+                appData.users.push({ id: generateId(), name, username, password, role: 'user', status: 'pending' });
+                saveData();
+                alert("¡Registro exitoso! Tu cuenta está pendiente de autorización por el administrador.");
+                toggleAuthMode();
+            } else {
+                const user = appData.users.find(u => u.username === username && u.password === password);
+                if (!user) return alert("Usuario o contraseña incorrectos.");
+                
+                if (user.status !== 'approved') {
+                    return alert("Tu cuenta aún no ha sido autorizada por el administrador.");
+                }
+
+                currentUser = user;
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.getElementById('userNameDisplay').innerText = currentUser.name;
+                document.getElementById('userRoleBadge').innerText = currentUser.role === 'admin' ? 'ADMINISTRADOR' : 'COLABORADOR';
+                
+                if (currentUser.role === 'admin') {
+                    document.getElementById('tabBtnUsers').classList.remove('hidden');
+                } else {
+                    document.getElementById('tabBtnUsers').classList.add('hidden');
+                }
+
+                renderAreas();
+                renderHistory();
+                renderUsers();
+            }
         });
 
         function logout() {
+            currentUser = null;
             document.getElementById('appContainer').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('authForm').reset();
         }
 
-        // Pestañas
         function switchTab(tab) {
-            if (tab === 'areas') {
-                document.getElementById('viewAreas').classList.remove('hidden');
-                document.getElementById('viewHistory').classList.add('hidden');
-                document.getElementById('tabBtnAreas').className = "px-4 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors";
-                document.getElementById('tabBtnHistory').className = "px-4 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors";
-            } else {
-                document.getElementById('viewAreas').classList.add('hidden');
-                document.getElementById('viewHistory').classList.remove('hidden');
-                document.getElementById('tabBtnHistory').className = "px-4 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors";
-                document.getElementById('tabBtnAreas').className = "px-4 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors";
-            }
-        }
-
-        // Historial Render
-        function renderHistory() {
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-            if (!appData.history || appData.history.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin cambios registrados aún.</td></tr>`;
-                return;
-            }
-            appData.history.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50";
-                tr.innerHTML = `
-                    <td class="p-4 text-slate-500 whitespace-nowrap">${item.date}</td>
-                    <td class="p-4 font-medium text-slate-800">${item.user}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">${item.action}</span></td>
-                    <td class="p-4 text-slate-600">${item.detail}</td>
-                `;
-                tbody.appendChild(tr);
+            ['areas', 'history', 'users'].forEach(t => {
+                document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) btn.className = `px-3 py-2 rounded-lg font-medium text-sm transition-colors ${t === tab ? 'bg-brand-50 text-brand-600' : 'text-slate-600 hover:bg-slate-100'}`;
             });
         }
 
-        // Render Áreas
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            let pendingCount = 0;
+
+            appData.users.forEach(u => {
+                if (u.status === 'pending') pendingCount++;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-slate-800">${u.name}</td>
+                    <td class="p-4 text-slate-600 font-mono text-xs">@${u.username}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${u.status === 'approved' ? 'Autorizado' : 'Pendiente'}</span></td>
+                    <td class="p-4 text-right space-x-2">
+                        ${u.status === 'pending' ? `<button onclick="approveUser('${u.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold">Aprobar</button>` : ''}
+                        ${u.id !== 'admin_master' ? `<button onclick="deleteUser('${u.id}')" class="text-red-500 text-xs font-bold">Eliminar</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const badge = document.getElementById('pendingBadge');
+            badge.innerText = pendingCount;
+            badge.classList.toggle('hidden', pendingCount === 0);
+        }
+
+        function approveUser(id) {
+            const u = appData.users.find(user => user.id === id);
+            if (u) {
+                u.status = 'approved';
+                logAction('AUTORIZAR USUARIO', `Se aprobó el acceso a ${u.name} (@${u.username})`);
+                saveData();
+            }
+        }
+
+        function deleteUser(id) {
+            if (confirm("¿Eliminar usuario?")) {
+                appData.users = appData.users.filter(u => u.id !== id);
+                saveData();
+            }
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = appData.history.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin cambios registrados.</td></tr>` : 
+                appData.history.map(item => `<tr class="hover:bg-slate-50"><td class="p-4 text-slate-500">${item.date}</td><td class="p-4 font-bold text-brand-600">${item.user}</td><td class="p-4"><span class="px-2 py-1 bg-slate-100 rounded text-xs font-bold">${item.action}</span></td><td class="p-4 text-slate-600">${item.detail}</td></tr>`).join('');
+        }
+
         function renderAreas() {
             const grid = document.getElementById('areasGrid');
-            grid.innerHTML = '';
-            appData.areas.forEach(area => {
-                const count = area.processes ? area.processes.length : 0;
-                const card = document.createElement('div');
-                card.className = 'bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow group relative';
-                card.innerHTML = `
+            grid.innerHTML = appData.areas.map(area => `
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative group">
                     <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onclick="editArea('${area.id}')" class="text-slate-400 hover:text-brand-600">✏️</button>
                         <button onclick="deleteArea('${area.id}')" class="text-slate-400 hover:text-red-600">🗑️</button>
@@ -306,12 +391,11 @@
                     <h3 class="text-lg font-bold text-slate-800 mb-1">${area.name}</h3>
                     <p class="text-sm text-slate-500 mb-4 line-clamp-2">${area.description || 'Sin descripción.'}</p>
                     <div class="border-t border-slate-100 pt-4 flex justify-between items-center">
-                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">${count} Procesos</span>
-                        <button onclick="openProcessList('${area.id}')" class="text-brand-600 text-sm font-medium hover:text-brand-800">Gestionar &rarr;</button>
+                        <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">${area.processes ? area.processes.length : 0} Procesos</span>
+                        <button onclick="openProcessList('${area.id}')" class="text-brand-600 text-sm font-medium hover:underline">Gestionar &rarr;</button>
                     </div>
-                `;
-                grid.appendChild(card);
-            });
+                </div>
+            `).join('');
         }
 
         function openAreaModal() {
@@ -319,187 +403,137 @@
             document.getElementById('areaName').value = '';
             document.getElementById('areaDesc').value = '';
             document.getElementById('areaModalTitle').innerText = 'Nueva Área';
-            document.getElementById('areaModal').classList.remove('hidden');
-            document.getElementById('areaModal').classList.add('flex');
+            document.getElementById('areaModal').classList.replace('hidden', 'flex');
         }
-
-        function closeAreaModal() {
-            document.getElementById('areaModal').classList.add('hidden');
-            document.getElementById('areaModal').classList.remove('flex');
-        }
+        function closeAreaModal() { document.getElementById('areaModal').classList.replace('flex', 'hidden'); }
 
         function saveArea() {
             const id = document.getElementById('areaId').value;
             const name = document.getElementById('areaName').value.trim();
             const desc = document.getElementById('areaDesc').value.trim();
-            if (!name) return alert("El nombre es requerido.");
+            if (!name) return alert("Nombre requerido.");
 
             if (id) {
-                const area = appData.areas.find(a => a.id === id);
-                if (area) {
-                    area.name = name;
-                    area.description = desc;
-                    logAction('EDITAR ÁREA', `Se actualizó el área: ${name}`);
-                }
+                const a = appData.areas.find(item => item.id === id);
+                a.name = name; a.description = desc;
+                logAction('EDITAR ÁREA', `Se actualizó el área ${name}`);
             } else {
                 appData.areas.push({ id: generateId(), name, description: desc, processes: [] });
-                logAction('CREAR ÁREA', `Se creó la nueva área: ${name}`);
+                logAction('CREAR ÁREA', `Se creó el área ${name}`);
             }
             saveData();
             closeAreaModal();
         }
 
         function editArea(id) {
-            const area = appData.areas.find(a => a.id === id);
-            if (area) {
-                document.getElementById('areaId').value = area.id;
-                document.getElementById('areaName').value = area.name;
-                document.getElementById('areaDesc').value = area.description;
-                document.getElementById('areaModalTitle').innerText = 'Editar Área';
-                document.getElementById('areaModal').classList.remove('hidden');
-                document.getElementById('areaModal').classList.add('flex');
-            }
+            const a = appData.areas.find(item => item.id === id);
+            document.getElementById('areaId').value = a.id;
+            document.getElementById('areaName').value = a.name;
+            document.getElementById('areaDesc').value = a.description;
+            document.getElementById('areaModalTitle').innerText = 'Editar Área';
+            document.getElementById('areaModal').classList.replace('hidden', 'flex');
         }
 
         function deleteArea(id) {
-            if (confirm("¿Estás seguro de eliminar esta área?")) {
-                const area = appData.areas.find(a => a.id === id);
+            if (confirm("¿Eliminar área?")) {
                 appData.areas = appData.areas.filter(a => a.id !== id);
-                logAction('ELIMINAR ÁREA', `Se eliminó el área: ${area ? area.name : id}`);
+                logAction('ELIMINAR ÁREA', 'Se eliminó un área');
                 saveData();
             }
         }
 
         function openProcessList(areaId) {
             const area = appData.areas.find(a => a.id === areaId);
-            if (!area) return;
             if (!area.processes) area.processes = [];
             if (area.processes.length === 0) area.processes.push({ id: generateId(), name: '', description: '', objective: '', steps: [] });
-
-            const proc = area.processes[0];
+            const p = area.processes[0];
             document.getElementById('currentAreaId').value = area.id;
-            document.getElementById('currentProcessId').value = proc.id;
+            document.getElementById('currentProcessId').value = p.id;
             document.getElementById('builderAreaName').innerText = `Manual: ${area.name}`;
-            document.getElementById('procName').value = proc.name;
-            document.getElementById('procDesc').value = proc.description;
-            document.getElementById('procObj').value = proc.objective;
-
-            renderStepsList(proc.steps);
+            document.getElementById('procName').value = p.name;
+            document.getElementById('procDesc').value = p.description;
+            document.getElementById('procObj').value = p.objective;
+            renderStepsList(p.steps);
             document.getElementById('appContainer').classList.add('hidden');
-            document.getElementById('processBuilder').classList.remove('hidden');
-            document.getElementById('processBuilder').classList.add('flex');
+            document.getElementById('processBuilder').classList.replace('hidden', 'flex');
         }
 
         function closeProcessBuilder() {
             saveCurrentProcess();
-            document.getElementById('processBuilder').classList.add('hidden');
-            document.getElementById('processBuilder').classList.remove('flex');
+            document.getElementById('processBuilder').classList.replace('flex', 'hidden');
             document.getElementById('appContainer').classList.remove('hidden');
             renderAreas();
         }
 
         function saveCurrentProcess() {
-            const areaId = document.getElementById('currentAreaId').value;
-            const procId = document.getElementById('currentProcessId').value;
-            const area = appData.areas.find(a => a.id === areaId);
-            if (!area) return;
-            const procIndex = area.processes.findIndex(p => p.id === procId);
-            if (procIndex === -1) return;
-
-            const stepsDivs = document.querySelectorAll('.step-item');
-            const steps = [];
-            stepsDivs.forEach((div, index) => {
-                steps.push({
-                    number: index + 1,
-                    title: div.querySelector('.step-title').value,
-                    description: div.querySelector('.step-desc').value,
-                    image: div.querySelector('.step-img-data').value
-                });
-            });
-
-            const pName = document.getElementById('procName').value;
-            area.processes[procIndex] = {
-                id: procId,
-                name: pName,
-                description: document.getElementById('procDesc').value,
-                objective: document.getElementById('procObj').value,
-                steps: steps
-            };
-            logAction('ACTUALIZAR MANUAL', `Se modificó el proceso "${pName || 'Sin Título'}" en el área ${area.name}`);
+            const area = appData.areas.find(a => a.id === document.getElementById('currentAreaId').value);
+            const p = area.processes.find(item => item.id === document.getElementById('currentProcessId').value);
+            p.name = document.getElementById('procName').value;
+            p.description = document.getElementById('procDesc').value;
+            p.objective = document.getElementById('procObj').value;
+            p.steps = Array.from(document.querySelectorAll('.step-item')).map(div => ({
+                title: div.querySelector('.step-title').value,
+                description: div.querySelector('.step-desc').value,
+                image: div.querySelector('.step-img-data').value
+            }));
+            logAction('ACTUALIZAR MANUAL', `Se modificó el proceso "${p.name || 'Sin Título'}"`);
             saveData();
         }
 
         function renderStepsList(steps) {
-            const container = document.getElementById('stepsContainer');
-            container.innerHTML = '';
-            steps.forEach(s => addStepToUI(s));
-            if (steps.length === 0) addStep();
+            document.getElementById('stepsContainer').innerHTML = '';
+            (steps.length ? steps : [{title:'', description:'', image:''}]).forEach(s => addStepToUI(s));
         }
 
-        function addStep() { addStepToUI({ title: '', description: '', image: '' }); }
+        function addStep() { addStepToUI({title:'', description:'', image:''}); }
 
         function addStepToUI(data) {
-            const container = document.getElementById('stepsContainer');
-            const stepDiv = document.createElement('div');
-            stepDiv.className = 'step-item bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm relative';
-            const imgStyle = data.image ? '' : 'display: none;';
-            const phStyle = data.image ? 'display: none;' : '';
-            stepDiv.innerHTML = `
+            const div = document.createElement('div');
+            div.className = 'step-item bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative';
+            div.innerHTML = `
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="flex-1 space-y-4">
-                        <input type="text" class="step-title w-full px-3 py-2 border border-slate-200 rounded-lg font-bold text-slate-800 outline-none" placeholder="Título del paso" value="${data.title || ''}">
-                        <textarea rows="3" class="step-desc w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-600 outline-none" placeholder="Instrucción detallada...">${data.description || ''}</textarea>
+                        <input type="text" class="step-title w-full px-3 py-2 border rounded-lg font-bold outline-none" placeholder="Título del paso" value="${data.title}">
+                        <textarea rows="3" class="step-desc w-full px-3 py-2 border rounded-lg outline-none" placeholder="Instrucción...">${data.description}</textarea>
                     </div>
                     <div class="w-full md:w-1/3 flex flex-col gap-2">
-                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 text-center relative h-28 flex flex-col items-center justify-center cursor-pointer" onclick="this.querySelector('input').click()">
+                        <div class="border-2 border-dashed rounded-lg p-2 text-center relative h-28 flex flex-col items-center justify-center cursor-pointer" onclick="this.querySelector('input').click()">
                             <input type="file" class="hidden" accept="image/*" onchange="handleImg(this)">
-                            <img src="${data.image || ''}" class="step-img-preview absolute inset-0 w-full h-full object-contain p-1 bg-white" style="${imgStyle}">
-                            <span class="step-img-placeholder text-xs text-slate-400" style="${phStyle}">Subir Imagen</span>
-                            <input type="hidden" class="step-img-data" value="${data.image || ''}">
+                            <img src="${data.image}" class="step-img-preview absolute inset-0 w-full h-full object-contain p-1 bg-white" style="${data.image ? '' : 'display:none;'}">
+                            <span class="step-img-placeholder text-xs text-slate-400" style="${data.image ? 'display:none;' : ''}">Subir Imagen</span>
+                            <input type="hidden" class="step-img-data" value="${data.image}">
                         </div>
                         <button onclick="this.closest('.step-item').remove()" class="text-xs text-red-500 font-medium text-right">Eliminar Paso</button>
                     </div>
-                </div>
-            `;
-            container.appendChild(stepDiv);
+                </div>`;
+            document.getElementById('stepsContainer').appendChild(div);
         }
 
         function handleImg(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const wrap = input.parentElement;
-                    wrap.querySelector('.step-img-preview').src = e.target.result;
-                    wrap.querySelector('.step-img-preview').style.display = 'block';
-                    wrap.querySelector('.step-img-placeholder').style.display = 'none';
-                    wrap.querySelector('.step-img-data').value = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const wrap = input.parentElement;
+                wrap.querySelector('.step-img-preview').src = e.target.result;
+                wrap.querySelector('.step-img-preview').style.display = 'block';
+                wrap.querySelector('.step-img-placeholder').style.display = 'none';
+                wrap.querySelector('.step-img-data').value = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
         }
 
         function previewManual() {
             saveCurrentProcess();
-            const procName = document.getElementById('procName').value || 'Procedimiento';
-            const docContainer = document.getElementById('manualDocument');
-            let html = `<h1 class="text-2xl font-bold mb-4">${procName}</h1><div class="space-y-4">`;
+            const pName = document.getElementById('procName').value || 'Procedimiento';
+            let html = `<h1 class="text-2xl font-bold mb-4">${pName}</h1><div class="space-y-4">`;
             document.querySelectorAll('.step-item').forEach((div, i) => {
-                const t = div.querySelector('.step-title').value;
-                const d = div.querySelector('.step-desc').value;
-                const img = div.querySelector('.step-img-data').value;
-                html += `<div class="border-l-4 border-brand-500 pl-4 py-2"><h3 class="font-bold">Paso ${i+1}: ${t}</h3><p class="text-sm text-slate-600 mb-2">${d}</p>${img ? `<img src="${img}" class="max-h-48 object-contain rounded" />` : ''}</div>`;
+                html += `<div class="border-l-4 border-brand-500 pl-4 py-2"><h3 class="font-bold">Paso ${i+1}: ${div.querySelector('.step-title').value}</h3><p class="text-sm text-slate-600 mb-2">${div.querySelector('.step-desc').value}</p>${div.querySelector('.step-img-data').value ? `<img src="${div.querySelector('.step-img-data').value}" class="max-h-48 object-contain rounded" />` : ''}</div>`;
             });
             html += `</div>`;
-            docContainer.innerHTML = html;
-            document.getElementById('previewModal').classList.remove('hidden');
-            document.getElementById('previewModal').classList.add('flex');
+            document.getElementById('manualDocument').innerHTML = html;
+            document.getElementById('previewModal').classList.replace('hidden', 'flex');
         }
 
-        function closePreview() {
-            document.getElementById('previewModal').classList.add('hidden');
-            document.getElementById('previewModal').classList.remove('flex');
-        }
+        function closePreview() { document.getElementById('previewModal').classList.replace('flex', 'hidden'); }
     </script>
 </body>
 </html>
