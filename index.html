@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Manuales - Almacén</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -19,42 +21,44 @@
             }
         }
     </script>
+    <!-- Librería para exportar a PDF real -->
+    <script src="https://cdnjs.cloudflare.com/ajax5/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors">
 
     <!-- ==========================================
          PANTALLA DE ACCESO (LOGIN / REGISTRO)
          ========================================== -->
     <div id="authScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
             <div class="flex justify-center mb-6">
                 <img src="logo.png" alt="Ingram Micro Logo" class="h-16 object-contain rounded" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white font-bold p-3 rounded-lg text-xl\'>INGRAM MICRO</div>'">
             </div>
             
-            <h2 id="authTitle" class="text-2xl font-bold text-center text-slate-900 mb-2">Iniciar Sesión</h2>
-            <p id="authSubtitle" class="text-center text-slate-500 mb-6 text-sm">Portal de Manuales y Procesos de Almacén</p>
+            <h2 id="authTitle" class="text-2xl font-bold text-center text-slate-900 dark:text-white mb-2">Iniciar Sesión</h2>
+            <p id="authSubtitle" class="text-center text-slate-500 dark:text-slate-400 mb-6 text-sm">Portal de Manuales y Procesos de Almacén</p>
             
             <form id="authForm" class="space-y-4">
                 <div id="nameFieldContainer" class="hidden">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Nombre Completo</label>
-                    <input type="text" id="regFullNameInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Tu Nombre y Apellido">
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Nombre Completo</label>
+                    <input type="text" id="regFullNameInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Tu Nombre y Apellido">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Nombre de Usuario</label>
-                    <input type="text" id="usernameInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. kevin_almacen" required>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Nombre de Usuario</label>
+                    <input type="text" id="usernameInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. kevin_almacen" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Contraseña</label>
-                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="••••••••" required>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Contraseña</label>
+                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none" placeholder="••••••••" required>
                 </div>
                 <button type="submit" id="authSubmitBtn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
                     Ingresar
                 </button>
             </form>
 
-            <div class="mt-6 text-center border-t border-slate-100 pt-4">
-                <p id="authToggleText" class="text-sm text-slate-600">
-                    ¿No tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline">Regístrate aquí</button>
+            <div class="mt-6 text-center border-t border-slate-100 dark:border-slate-700 pt-4">
+                <p id="authToggleText" class="text-sm text-slate-600 dark:text-slate-400">
+                    ¿No tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 dark:text-brand-400 font-bold hover:underline">Regístrate aquí</button>
                 </p>
             </div>
         </div>
@@ -66,48 +70,56 @@
     <div id="appContainer" class="hidden flex flex-col h-screen">
         
         <!-- HEADER -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <div class="flex items-center gap-4">
                         <img src="logo.png" alt="Ingram Micro" class="h-8 object-contain" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white text-xs font-bold px-2 py-1 rounded\'>INGRAM MICRO</div>'">
-                        <span class="font-bold text-lg text-slate-800 border-l border-slate-300 pl-4">Gestor de Manuales</span>
+                        <span class="font-bold text-lg text-slate-800 dark:text-white border-l border-slate-300 dark:border-slate-600 pl-4">Gestor de Manuales</span>
                     </div>
                     
                     <!-- Pestañas de Navegación -->
                     <div class="flex items-center gap-2">
-                        <button onclick="switchTab('areas')" id="tabBtnAreas" class="px-3 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 transition-colors">Áreas Operativas</button>
-                        <button onclick="switchTab('history')" id="tabBtnHistory" class="px-3 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors">Historial</button>
-                        <button onclick="switchTab('users')" id="tabBtnUsers" class="hidden px-3 py-2 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-100 transition-colors relative">
+                        <button onclick="switchTab('areas')" id="tabBtnAreas" class="px-3 py-2 rounded-lg font-medium text-sm bg-brand-50 text-brand-600 dark:bg-slate-700 dark:text-white transition-colors">Áreas Operativas</button>
+                        <button onclick="switchTab('history')" id="tabBtnHistory" class="px-3 py-2 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Historial</button>
+                        <button onclick="switchTab('users')" id="tabBtnUsers" class="hidden px-3 py-2 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors relative">
                             Autorizar Usuarios <span id="pendingBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full hidden">0</span>
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <!-- Botón Modo Oscuro -->
+                        <button onclick="toggleDarkMode()" class="p-2 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" title="Cambiar Tema">
+                            <span id="themeIcon">🌙</span>
+                        </button>
                         <div class="text-right">
-                            <span id="userNameDisplay" class="block text-xs font-bold text-slate-800">Usuario</span>
+                            <span id="userNameDisplay" class="block text-xs font-bold text-slate-800 dark:text-white">Usuario</span>
                             <span id="userRoleBadge" class="text-[10px] uppercase font-bold text-slate-400">Rol</span>
                         </div>
-                        <button onclick="logout()" class="text-sm text-red-600 hover:text-red-800 font-medium px-3 py-2 rounded hover:bg-red-50 transition-colors">Salir</button>
+                        <button onclick="logout()" class="text-sm text-red-600 dark:text-red-400 font-medium px-3 py-2 rounded hover:bg-red-50 dark:hover:bg-slate-700 transition-colors">Salir</button>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- CONTENIDO -->
-        <main class="flex-1 overflow-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
+        <main class="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
             <div class="max-w-7xl mx-auto">
                 
                 <!-- VISTA 1: ÁREAS Y MANUALES -->
                 <div id="viewAreas" class="space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h1 class="text-2xl font-bold text-slate-900">Áreas Operativas de Almacén</h1>
-                            <p class="text-slate-500 text-sm">Administra departamentos y diseña guías de capacitación paso a paso.</p>
+                            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Áreas Operativas de Almacén</h1>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Consulta y administra guías de capacitación paso a paso.</p>
                         </div>
-                        <button onclick="openAreaModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2">
-                            + Nueva Área
-                        </button>
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <!-- Buscador en tiempo real -->
+                            <input type="text" id="searchInput" oninput="filterAreas()" placeholder="Buscar proceso o área..." class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500 w-full sm:w-64">
+                            <button id="btnNewArea" onclick="openAreaModal()" class="hidden bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors whitespace-nowrap">
+                                + Nueva Área
+                            </button>
+                        </div>
                     </div>
                     <div id="areasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 </div>
@@ -115,20 +127,20 @@
                 <!-- VISTA 2: HISTORIAL -->
                 <div id="viewHistory" class="space-y-6 hidden">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900">Historial de Cambios y Auditoría</h1>
-                        <p class="text-slate-500 text-sm">Registro exacto de qué usuario realizó cada cambio.</p>
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Historial de Cambios y Auditoría</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Registro exacto de qué usuario realizó cada modificación.</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
                                     <th class="p-4">Fecha y Hora</th>
                                     <th class="p-4">Usuario</th>
                                     <th class="p-4">Acción</th>
                                     <th class="p-4">Detalle</th>
                                 </tr>
                             </thead>
-                            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                            <tbody id="historyTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -136,20 +148,21 @@
                 <!-- VISTA 3: GESTIÓN Y AUTORIZACIÓN DE USUARIOS (SOLO ADMIN) -->
                 <div id="viewUsers" class="space-y-6 hidden">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900">Autorización de Cuentas Nuevas</h1>
-                        <p class="text-slate-500 text-sm">Aprueba o rechaza el acceso de los colaboradores que intentan ingresar a la app.</p>
+                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Autorización y Roles de Usuarios</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Aprueba cuentas y define si los colaboradores pueden editar o solo leer.</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
                                     <th class="p-4">Nombre Completo</th>
                                     <th class="p-4">Usuario</th>
+                                    <th class="p-4">Rol Asignado</th>
                                     <th class="p-4">Estado</th>
                                     <th class="p-4 text-right">Acciones de Admin</th>
                                 </tr>
                             </thead>
-                            <tbody id="usersTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                            <tbody id="usersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -160,64 +173,67 @@
 
     <!-- MODAL ÁREA -->
     <div id="areaModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-40 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-lg text-slate-800" id="areaModalTitle">Nueva Área</h3>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
+                <h3 class="font-bold text-lg text-slate-800 dark:text-white" id="areaModalTitle">Nueva Área</h3>
                 <button onclick="closeAreaModal()" class="text-slate-400 hover:text-slate-600">✕</button>
             </div>
             <div class="p-6 space-y-4">
                 <input type="hidden" id="areaId">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Área</label>
-                    <input type="text" id="areaName" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none" placeholder="Ej. Recibo...">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre del Área</label>
+                    <input type="text" id="areaName" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg outline-none bg-transparent" placeholder="Ej. Recibo...">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-                    <textarea id="areaDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descripción</label>
+                    <textarea id="areaDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg outline-none bg-transparent"></textarea>
                 </div>
             </div>
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                <button onclick="closeAreaModal()" class="px-4 py-2 text-slate-600 font-medium rounded-lg">Cancelar</button>
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
+                <button onclick="closeAreaModal()" class="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium rounded-lg">Cancelar</button>
                 <button onclick="saveArea()" class="px-4 py-2 bg-brand-500 text-white font-medium rounded-lg shadow-sm">Guardar</button>
             </div>
         </div>
     </div>
 
     <!-- CONSTRUCTOR -->
-    <div id="processBuilder" class="fixed inset-0 bg-slate-50 hidden flex-col z-40">
-        <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm">
+    <div id="processBuilder" class="fixed inset-0 bg-slate-50 dark:bg-slate-900 hidden flex-col z-40">
+        <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
-                <button onclick="closeProcessBuilder()" class="text-slate-500 bg-slate-100 px-3 py-2 rounded-lg font-medium">← Volver</button>
-                <h2 class="font-bold text-xl text-slate-800" id="builderAreaName">Constructor</h2>
+                <button onclick="closeProcessBuilder()" class="text-slate-500 bg-slate-100 dark:bg-slate-700 px-3 py-2 rounded-lg font-medium">← Volver</button>
+                <h2 class="font-bold text-xl text-slate-800 dark:text-white" id="builderAreaName">Constructor</h2>
             </div>
-            <button onclick="previewManual()" class="bg-brand-500 text-white px-4 py-2 rounded-lg font-medium">Vista Previa / PDF</button>
+            <div class="flex gap-2">
+                <button onclick="previewManual()" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white px-4 py-2 rounded-lg font-medium">Vista Previa</button>
+                <button onclick="saveCurrentProcess()" class="bg-brand-500 text-white px-4 py-2 rounded-lg font-medium">Guardar Cambios</button>
+            </div>
         </header>
         <div class="flex-1 overflow-auto p-4 sm:p-8">
             <div class="max-w-4xl mx-auto space-y-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
                     <input type="hidden" id="currentAreaId">
                     <input type="hidden" id="currentProcessId">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del Proceso</label>
-                            <input type="text" id="procName" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-lg font-medium outline-none">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre del Proceso</label>
+                            <input type="text" id="procName" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-lg font-medium outline-none bg-transparent">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-                                <textarea id="procDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descripción</label>
+                                <textarea id="procDesc" rows="2" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg outline-none bg-transparent"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Objetivo</label>
-                                <textarea id="procObj" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none"></textarea>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Objetivo</label>
+                                <textarea id="procObj" rows="2" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg outline-none bg-transparent"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Pasos</h3>
-                        <button onclick="addStep()" class="text-brand-600 font-medium bg-brand-50 px-3 py-1.5 rounded-lg">+ Añadir Paso</button>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Pasos Operativos</h3>
+                        <button onclick="addStep()" class="text-brand-600 dark:text-brand-400 font-medium bg-brand-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-brand-200 dark:border-slate-700">+ Añadir Paso</button>
                     </div>
                     <div id="stepsContainer" class="space-y-4"></div>
                 </div>
@@ -227,28 +243,43 @@
 
     <!-- VISTA PREVIA MODAL -->
     <div id="previewModal" class="fixed inset-0 bg-slate-900/80 hidden flex-col z-50 backdrop-blur-sm">
-        <div class="bg-white px-6 py-4 flex justify-between items-center shadow-md">
-            <h2 class="text-xl font-bold text-slate-800">Vista Previa</h2>
+        <div class="bg-white dark:bg-slate-800 px-6 py-4 flex justify-between items-center shadow-md border-b dark:border-slate-700">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Vista Previa e Impresión</h2>
             <div class="flex gap-3">
-                <button onclick="closePreview()" class="px-4 py-2 text-slate-600 rounded-lg">Cerrar</button>
-                <button onclick="window.print()" class="px-4 py-2 bg-green-600 text-white rounded-lg">Imprimir / PDF</button>
+                <button onclick="closePreview()" class="px-4 py-2 text-slate-600 dark:text-slate-300 rounded-lg">Cerrar</button>
+                <button onclick="downloadPDF()" class="px-4 py-2 bg-brand-500 text-white font-bold rounded-lg shadow-sm flex items-center gap-2">📥 Descargar PDF</button>
             </div>
         </div>
-        <div class="flex-1 overflow-auto p-8"><div id="manualDocument" class="bg-white max-w-4xl mx-auto shadow-2xl p-8 min-h-[1056px]"></div></div>
+        <div class="flex-1 overflow-auto p-8 bg-slate-100 dark:bg-slate-900">
+            <div id="manualDocument" class="bg-white text-slate-900 max-w-4xl mx-auto shadow-2xl p-10 min-h-[1056px] rounded-xl"></div>
+        </div>
     </div>
 
     <!-- LÓGICA -->
     <script>
-        let appData = JSON.parse(localStorage.getItem('warehouseManualsSystemV3')) || { 
+        let appData = JSON.parse(localStorage.getItem('warehouseManualsSystemV4')) || { 
             areas: [], 
             history: [], 
             users: [{ id: 'admin_master', name: 'Administrador Maestro', username: 'admin', password: 'admin', role: 'admin', status: 'approved' }] 
         };
         let currentUser = null;
         let isRegistering = false;
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('themeIcon').innerText = '☀️';
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('darkMode', isDarkMode);
+            document.documentElement.classList.toggle('dark', isDarkMode);
+            document.getElementById('themeIcon').innerText = isDarkMode ? '☀️' : '🌙';
+        }
 
         function saveData() {
-            localStorage.setItem('warehouseManualsSystemV3', JSON.stringify(appData));
+            localStorage.setItem('warehouseManualsSystemV4', JSON.stringify(appData));
             renderAreas();
             renderHistory();
             renderUsers();
@@ -274,8 +305,8 @@
             document.getElementById('nameFieldContainer').classList.toggle('hidden', !isRegistering);
             document.getElementById('regFullNameInput').required = isRegistering;
             document.getElementById('authToggleText').innerHTML = isRegistering ? 
-                '¿Ya tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline">Inicia Sesión</button>' : 
-                '¿No tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 font-bold hover:underline">Regístrate aquí</button>';
+                '¿Ya tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 dark:text-brand-400 font-bold hover:underline">Inicia Sesión</button>' : 
+                '¿No tienes cuenta? <button onclick="toggleAuthMode()" class="text-brand-600 dark:text-brand-400 font-bold hover:underline">Regístrate aquí</button>';
         }
 
         document.getElementById('authForm').addEventListener('submit', function(e) {
@@ -285,30 +316,34 @@
 
             if (isRegistering) {
                 const name = document.getElementById('regFullNameInput').value.trim();
-                if (appData.users.some(u => u.username === username)) return alert("Este nombre de usuario ya está en uso. Elige otro.");
+                if (appData.users.some(u => u.username === username)) return alert("Este nombre de usuario ya está en uso.");
                 
-                appData.users.push({ id: generateId(), name, username, password, role: 'user', status: 'pending' });
+                appData.users.push({ id: generateId(), name, username, password, role: 'viewer', status: 'pending' });
                 saveData();
                 alert("¡Registro exitoso! Tu cuenta está pendiente de autorización por el administrador.");
                 toggleAuthMode();
             } else {
                 const user = appData.users.find(u => u.username === username && u.password === password);
                 if (!user) return alert("Usuario o contraseña incorrectos.");
-                
-                if (user.status !== 'approved') {
-                    return alert("Tu cuenta aún no ha sido autorizada por el administrador.");
-                }
+                if (user.status !== 'approved') return alert("Tu cuenta aún no ha sido autorizada por el administrador.");
 
                 currentUser = user;
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
                 document.getElementById('userNameDisplay').innerText = currentUser.name;
-                document.getElementById('userRoleBadge').innerText = currentUser.role === 'admin' ? 'ADMINISTRADOR' : 'COLABORADOR';
+                
+                const roleNames = { admin: 'ADMINISTRADOR', editor: 'EDITOR / SUPERVISOR', viewer: 'COLABORADOR (LECTURA)' };
+                document.getElementById('userRoleBadge').innerText = roleNames[currentUser.role] || 'COLABORADOR';
                 
                 if (currentUser.role === 'admin') {
                     document.getElementById('tabBtnUsers').classList.remove('hidden');
+                    document.getElementById('btnNewArea').classList.remove('hidden');
+                } else if (currentUser.role === 'editor') {
+                    document.getElementById('tabBtnUsers').classList.add('hidden');
+                    document.getElementById('btnNewArea').classList.remove('hidden');
                 } else {
                     document.getElementById('tabBtnUsers').classList.add('hidden');
+                    document.getElementById('btnNewArea').classList.add('hidden');
                 }
 
                 renderAreas();
@@ -328,7 +363,7 @@
             ['areas', 'history', 'users'].forEach(t => {
                 document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
                 const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
-                if (btn) btn.className = `px-3 py-2 rounded-lg font-medium text-sm transition-colors ${t === tab ? 'bg-brand-50 text-brand-600' : 'text-slate-600 hover:bg-slate-100'}`;
+                if (btn) btn.className = `px-3 py-2 rounded-lg font-medium text-sm transition-colors ${t === tab ? 'bg-brand-50 text-brand-600 dark:bg-slate-700 dark:text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`;
             });
         }
 
@@ -341,9 +376,18 @@
                 if (u.status === 'pending') pendingCount++;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="p-4 font-bold text-slate-800">${u.name}</td>
-                    <td class="p-4 text-slate-600 font-mono text-xs">@${u.username}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${u.status === 'approved' ? 'Autorizado' : 'Pendiente'}</span></td>
+                    <td class="p-4 font-bold text-slate-800 dark:text-white">${u.name}</td>
+                    <td class="p-4 text-slate-600 dark:text-slate-400 font-mono text-xs">@${u.username}</td>
+                    <td class="p-4">
+                        ${u.id === 'admin_master' ? '<span class="text-xs font-bold text-brand-500">Administrador Maestro</span>' : `
+                            <select onchange="changeUserRole('${u.id}', this.value)" class="bg-slate-100 dark:bg-slate-700 text-xs px-2 py-1 rounded border border-slate-300 dark:border-slate-600 outline-none">
+                                <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Colaborador (Lectura)</option>
+                                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>Editor / Supervisor</option>
+                                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Administrador</option>
+                            </select>
+                        `}
+                    </td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}">${u.status === 'approved' ? 'Autorizado' : 'Pendiente'}</span></td>
                     <td class="p-4 text-right space-x-2">
                         ${u.status === 'pending' ? `<button onclick="approveUser('${u.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold">Aprobar</button>` : ''}
                         ${u.id !== 'admin_master' ? `<button onclick="deleteUser('${u.id}')" class="text-red-500 text-xs font-bold">Eliminar</button>` : ''}
@@ -357,6 +401,15 @@
             badge.classList.toggle('hidden', pendingCount === 0);
         }
 
+        function changeUserRole(id, newRole) {
+            const u = appData.users.find(user => user.id === id);
+            if (u) {
+                u.role = newRole;
+                logAction('CAMBIO DE ROL', `Se actualizó el rol de ${u.name} a ${newRole}`);
+                saveData();
+            }
+        }
+
         function approveUser(id) {
             const u = appData.users.find(user => user.id === id);
             if (u) {
@@ -367,7 +420,7 @@
         }
 
         function deleteUser(id) {
-            if (confirm("¿Eliminar usuario?")) {
+            if (confirm("¿Estás seguro de eliminar este usuario?")) {
                 appData.users = appData.users.filter(u => u.id !== id);
                 saveData();
             }
@@ -376,23 +429,36 @@
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = appData.history.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin cambios registrados.</td></tr>` : 
-                appData.history.map(item => `<tr class="hover:bg-slate-50"><td class="p-4 text-slate-500">${item.date}</td><td class="p-4 font-bold text-brand-600">${item.user}</td><td class="p-4"><span class="px-2 py-1 bg-slate-100 rounded text-xs font-bold">${item.action}</span></td><td class="p-4 text-slate-600">${item.detail}</td></tr>`).join('');
+                appData.history.map(item => `<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-4 text-slate-500 dark:text-slate-400 text-xs">${item.date}</td><td class="p-4 font-bold text-brand-600 dark:text-brand-400">${item.user}</td><td class="p-4"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-xs font-bold">${item.action}</span></td><td class="p-4 text-slate-600 dark:text-slate-300">${item.detail}</td></tr>`).join('');
+        }
+
+        function filterAreas() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.area-card');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(query) ? 'block' : 'none';
+            });
         }
 
         function renderAreas() {
             const grid = document.getElementById('areasGrid');
+            const canManage = currentUser && (currentUser.role === 'admin' || currentUser.role === 'editor');
+            
             grid.innerHTML = appData.areas.map(area => `
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative group">
-                    <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="editArea('${area.id}')" class="text-slate-400 hover:text-brand-600">✏️</button>
-                        <button onclick="deleteArea('${area.id}')" class="text-slate-400 hover:text-red-600">🗑️</button>
-                    </div>
-                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center mb-4 font-bold text-xl">📁</div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-1">${area.name}</h3>
-                    <p class="text-sm text-slate-500 mb-4 line-clamp-2">${area.description || 'Sin descripción.'}</p>
-                    <div class="border-t border-slate-100 pt-4 flex justify-between items-center">
-                        <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">${area.processes ? area.processes.length : 0} Procesos</span>
-                        <button onclick="openProcessList('${area.id}')" class="text-brand-600 text-sm font-medium hover:underline">Gestionar &rarr;</button>
+                <div class="area-card bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 relative group">
+                    ${canManage ? `
+                        <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="editArea('${area.id}')" class="text-slate-400 hover:text-brand-600">✏️</button>
+                            <button onclick="deleteArea('${area.id}')" class="text-slate-400 hover:text-red-600">🗑️</button>
+                        </div>
+                    ` : ''}
+                    <div class="w-12 h-12 bg-brand-50 dark:bg-slate-700 text-brand-600 dark:text-brand-400 rounded-lg flex items-center justify-center mb-4 font-bold text-xl">📁</div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-1">${area.name}</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">${area.description || 'Sin descripción.'}</p>
+                    <div class="border-t border-slate-100 dark:border-slate-700 pt-4 flex justify-between items-center">
+                        <span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-full">${area.processes ? area.processes.length : 0} Procesos</span>
+                        <button onclick="openProcessList('${area.id}')" class="text-brand-600 dark:text-brand-400 text-sm font-medium hover:underline">Consultar &rarr;</button>
                     </div>
                 </div>
             `).join('');
@@ -454,18 +520,26 @@
             document.getElementById('procDesc').value = p.description;
             document.getElementById('procObj').value = p.objective;
             renderStepsList(p.steps);
+            
+            // Si es lector, ocultar controles de edición dentro del constructor
+            const canManage = currentUser && (currentUser.role === 'admin' || currentUser.role === 'editor');
+            document.getElementById('procName').disabled = !canManage;
+            document.getElementById('procDesc').disabled = !canManage;
+            document.getElementById('procObj').disabled = !canManage;
+
             document.getElementById('appContainer').classList.add('hidden');
             document.getElementById('processBuilder').classList.replace('hidden', 'flex');
         }
 
         function closeProcessBuilder() {
-            saveCurrentProcess();
             document.getElementById('processBuilder').classList.replace('flex', 'hidden');
             document.getElementById('appContainer').classList.remove('hidden');
             renderAreas();
         }
 
         function saveCurrentProcess() {
+            if (currentUser && currentUser.role === 'viewer') return alert("No tienes permisos para modificar manuales.");
+            
             const area = appData.areas.find(a => a.id === document.getElementById('currentAreaId').value);
             const p = area.processes.find(item => item.id === document.getElementById('currentProcessId').value);
             p.name = document.getElementById('procName').value;
@@ -478,6 +552,7 @@
             }));
             logAction('ACTUALIZAR MANUAL', `Se modificó el proceso "${p.name || 'Sin Título'}"`);
             saveData();
+            alert("¡Manual guardado correctamente!");
         }
 
         function renderStepsList(steps) {
@@ -485,25 +560,29 @@
             (steps.length ? steps : [{title:'', description:'', image:''}]).forEach(s => addStepToUI(s));
         }
 
-        function addStep() { addStepToUI({title:'', description:'', image:''}); }
+        function addStep() {
+            if (currentUser && currentUser.role === 'viewer') return;
+            addStepToUI({title:'', description:'', image:''});
+        }
 
         function addStepToUI(data) {
+            const canManage = currentUser && (currentUser.role === 'admin' || currentUser.role === 'editor');
             const div = document.createElement('div');
-            div.className = 'step-item bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative';
+            div.className = 'step-item bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm relative';
             div.innerHTML = `
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="flex-1 space-y-4">
-                        <input type="text" class="step-title w-full px-3 py-2 border rounded-lg font-bold outline-none" placeholder="Título del paso" value="${data.title}">
-                        <textarea rows="3" class="step-desc w-full px-3 py-2 border rounded-lg outline-none" placeholder="Instrucción...">${data.description}</textarea>
+                        <input type="text" class="step-title w-full px-3 py-2 border dark:border-slate-700 rounded-lg font-bold outline-none bg-transparent" placeholder="Título del paso" value="${data.title}" ${!canManage ? 'disabled' : ''}>
+                        <textarea rows="3" class="step-desc w-full px-3 py-2 border dark:border-slate-700 rounded-lg outline-none bg-transparent" placeholder="Instrucción detallada..." ${!canManage ? 'disabled' : ''}>${data.description}</textarea>
                     </div>
                     <div class="w-full md:w-1/3 flex flex-col gap-2">
-                        <div class="border-2 border-dashed rounded-lg p-2 text-center relative h-28 flex flex-col items-center justify-center cursor-pointer" onclick="this.querySelector('input').click()">
-                            <input type="file" class="hidden" accept="image/*" onchange="handleImg(this)">
-                            <img src="${data.image}" class="step-img-preview absolute inset-0 w-full h-full object-contain p-1 bg-white" style="${data.image ? '' : 'display:none;'}">
+                        <div class="border-2 border-dashed dark:border-slate-700 rounded-lg p-2 text-center relative h-28 flex flex-col items-center justify-center ${canManage ? 'cursor-pointer' : ''}" ${canManage ? 'onclick="this.querySelector(\'input\').click()"' : ''}>
+                            <input type="file" class="hidden" accept="image/*" onchange="handleImg(this)" ${!canManage ? 'disabled' : ''}>
+                            <img src="${data.image}" class="step-img-preview absolute inset-0 w-full h-full object-contain p-1 bg-white dark:bg-slate-800" style="${data.image ? '' : 'display:none;'}">
                             <span class="step-img-placeholder text-xs text-slate-400" style="${data.image ? 'display:none;' : ''}">Subir Imagen</span>
                             <input type="hidden" class="step-img-data" value="${data.image}">
                         </div>
-                        <button onclick="this.closest('.step-item').remove()" class="text-xs text-red-500 font-medium text-right">Eliminar Paso</button>
+                        ${canManage ? '<button onclick="this.closest(\'.step-item\').remove()" class="text-xs text-red-500 font-medium text-right">Eliminar Paso</button>' : ''}
                     </div>
                 </div>`;
             document.getElementById('stepsContainer').appendChild(div);
@@ -522,15 +601,54 @@
         }
 
         function previewManual() {
-            saveCurrentProcess();
-            const pName = document.getElementById('procName').value || 'Procedimiento';
-            let html = `<h1 class="text-2xl font-bold mb-4">${pName}</h1><div class="space-y-4">`;
+            const pName = document.getElementById('procName').value || 'Procedimiento de Almacén';
+            const pDesc = document.getElementById('procDesc').value;
+            const pObj = document.getElementById('procObj').value;
+            
+            let html = `
+                <div style="font-family: Arial, sans-serif; color: #1e293b; padding: 20px;">
+                    <div style="border-bottom: 2px solid #0055d4; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1 style="margin: 0; font-size: 22px; color: #0055d4;">INGRAM MICRO - MANUAL OPERATIVO</h1>
+                            <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b;">Sistema de Procesos de Almacén</p>
+                        </div>
+                    </div>
+                    <h2 style="font-size: 20px; margin-bottom: 5px;">${pName}</h2>
+                    ${pDesc ? `<p style="font-size: 13px; color: #475569; margin-bottom: 10px;"><strong>Descripción:</strong> ${pDesc}</p>` : ''}
+                    ${pObj ? `<p style="font-size: 13px; color: #475569; margin-bottom: 20px;"><strong>Objetivo:</strong> ${pObj}</p>` : ''}
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    <div style="space-y: 20px;">
+            `;
+
             document.querySelectorAll('.step-item').forEach((div, i) => {
-                html += `<div class="border-l-4 border-brand-500 pl-4 py-2"><h3 class="font-bold">Paso ${i+1}: ${div.querySelector('.step-title').value}</h3><p class="text-sm text-slate-600 mb-2">${div.querySelector('.step-desc').value}</p>${div.querySelector('.step-img-data').value ? `<img src="${div.querySelector('.step-img-data').value}" class="max-h-48 object-contain rounded" />` : ''}</div>`;
+                const title = div.querySelector('.step-title').value;
+                const desc = div.querySelector('.step-desc').value;
+                const img = div.querySelector('.step-img-data').value;
+                
+                html += `
+                    <div style="margin-bottom: 25px; border-left: 3px solid #0055d4; padding-left: 12px;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 15px; color: #0f172a;">Paso ${i+1}: ${title || 'Sin título'}</h3>
+                        <p style="margin: 0 0 10px 0; font-size: 13px; color: #334155; line-height: 1.4;">${desc || 'Sin instrucción.'}</p>
+                        ${img ? `<div style="margin-top: 10px;"><img src="${img}" style="max-height: 200px; max-width: 100%; object-fit: contain; border-radius: 6px; border: 1px solid #cbd5e1;" /></div>` : ''}
+                    </div>
+                `;
             });
-            html += `</div>`;
+
+            html += `</div></div>`;
             document.getElementById('manualDocument').innerHTML = html;
             document.getElementById('previewModal').classList.replace('hidden', 'flex');
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('manualDocument');
+            const opt = {
+                margin:       10,
+                filename:     'Manual_Almacen_IngramMicro.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save();
         }
 
         function closePreview() { document.getElementById('previewModal').classList.replace('flex', 'hidden'); }
