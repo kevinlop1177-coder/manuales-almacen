@@ -12,11 +12,8 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: 'var(--brand-50)',
-                            100: 'var(--brand-100)',
-                            500: 'var(--brand-500)',
-                            600: 'var(--brand-600)',
-                            700: 'var(--brand-700)',
+                            50: 'var(--brand-50)', 100: 'var(--brand-100)',
+                            500: 'var(--brand-500)', 600: 'var(--brand-600)', 700: 'var(--brand-700)',
                         }
                     }
                 }
@@ -24,36 +21,22 @@
         }
     </script>
     <style>
-        :root {
-            --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-500: #3b82f6; --brand-600: #2563eb; --brand-700: #1d4ed8;
-        }
-        [data-theme="emerald"] {
-            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669; --brand-700: #047857;
-        }
-        [data-theme="slate"] {
-            --brand-50: #f8fafc; --brand-100: #f1f5f9; --brand-500: #475569; --brand-600: #334155; --brand-700: #1e293b;
-        }
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.1);
-        }
+        :root { --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-500: #3b82f6; --brand-600: #2563eb; --brand-700: #1d4ed8; }
+        [data-theme="emerald"] { --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669; --brand-700: #047857; }
+        [data-theme="slate"] { --brand-50: #f8fafc; --brand-100: #f1f5f9; --brand-500: #475569; --brand-600: #334155; --brand-700: #1e293b; }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.1); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors">
 
-    <!-- PANTALLA DE ACCESO -->
     <div id="authScreen" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center z-50 p-4">
         <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/20 dark:border-slate-800 relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-500 to-indigo-500"></div>
             
             <div class="flex justify-center mb-6">
-                <div class="bg-brand-500 text-white font-black p-4 rounded-2xl shadow-lg text-xl tracking-wider">
-                    INGRAM MICRO
-                </div>
+                <img src="logo.png" alt="Ingram Micro" class="h-12 object-contain rounded" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white font-black p-3 rounded-2xl shadow-lg text-xl\'>INGRAM MICRO</div>'">
             </div>
             
             <h2 id="authTitle" class="text-2xl font-black text-center text-slate-900 dark:text-white mb-1">Iniciar Sesión</h2>
@@ -85,13 +68,12 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
     <div id="appContainer" class="hidden flex flex-col h-screen">
         <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-20 items-center">
                     <div class="flex items-center gap-4">
-                        <div class="bg-brand-500 text-white font-black px-3 py-2 rounded-xl text-sm tracking-widest">IM</div>
+                        <img src="logo.png" alt="Ingram Micro" class="h-10 object-contain rounded" onerror="this.outerHTML='<div class=\'bg-brand-500 text-white font-black px-3 py-2 rounded-xl text-sm\'>IM</div>'">
                         <div>
                             <span class="block font-black text-lg text-slate-900 dark:text-white leading-tight">INGRAM MICRO</span>
                             <span class="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase">Portal de Manuales Kiosco</span>
@@ -127,7 +109,6 @@
 
         <main class="flex-1 overflow-auto p-4 sm:p-8">
             <div class="max-w-7xl mx-auto space-y-6">
-                <!-- VISTA ÁREAS -->
                 <div id="viewAreas" class="space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
                         <div>
@@ -142,7 +123,6 @@
                     <div id="areasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
                 </div>
 
-                <!-- VISTA HISTORIAL -->
                 <div id="viewHistory" class="space-y-6 hidden">
                     <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
                         <h1 class="text-2xl font-black text-slate-900 dark:text-white">Auditoría y Bitácora</h1>
@@ -159,7 +139,6 @@
                     </div>
                 </div>
 
-                <!-- VISTA USUARIOS -->
                 <div id="viewUsers" class="space-y-6 hidden">
                     <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
                         <h1 class="text-2xl font-black text-slate-900 dark:text-white">Autorización de Cuentas</h1>
@@ -179,7 +158,6 @@
         </main>
     </div>
 
-    <!-- MODAL ÁREA -->
     <div id="areaModal" class="fixed inset-0 bg-slate-950/60 hidden items-center justify-center z-40 backdrop-blur-md p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-800">
             <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -198,7 +176,6 @@
         </div>
     </div>
 
-    <!-- CONSTRUCTOR -->
     <div id="processBuilder" class="fixed inset-0 bg-slate-100 dark:bg-slate-950 hidden flex-col z-40">
         <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -229,7 +206,6 @@
         </div>
     </div>
 
-    <!-- VISTA PREVIA MODAL -->
     <div id="previewModal" class="fixed inset-0 bg-slate-950/80 hidden flex-col z-50 backdrop-blur-xl">
         <div class="bg-white dark:bg-slate-900 px-8 py-5 flex justify-between items-center shadow-lg border-b border-slate-200 dark:border-slate-800">
             <h2 class="text-lg font-black text-slate-900 dark:text-white">Vista Previa de Impresión</h2>
@@ -243,7 +219,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE FUNCIONAMIENTO -->
     <script>
         let appData = JSON.parse(localStorage.getItem('warehouseManualsSystemV5')) || { 
             areas: [], history: [], users: [{ id: 'admin_master', name: 'Administrador Maestro', username: 'admin', password: 'admin', role: 'admin', status: 'approved' }] 
@@ -472,6 +447,15 @@
             div.innerHTML = `
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="flex-1 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="step-number-label text-xs font-black uppercase text-brand-500">Paso</span>
+                            ${canManage ? `
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="moveStep(this, 'up')" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white transition-all" title="Subir Paso">▲ Subir</button>
+                                    <button type="button" onclick="moveStep(this, 'down')" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-brand-500 hover:text-white transition-all" title="Bajar Paso">▼ Bajar</button>
+                                </div>
+                            ` : ''}
+                        </div>
                         <input type="text" class="step-title w-full px-4 py-2.5 border rounded-2xl font-black outline-none bg-slate-50 dark:bg-slate-800 text-sm" placeholder="Título del paso" value="${data.title}" ${!canManage?'disabled':''}>
                         <textarea rows="3" class="step-desc w-full px-4 py-2.5 border rounded-2xl outline-none bg-slate-50 dark:bg-slate-800 text-sm resize-none" placeholder="Instrucción..." ${!canManage?'disabled':''}>${data.description}</textarea>
                     </div>
@@ -486,6 +470,33 @@
                     </div>
                 </div>`;
             document.getElementById('stepsContainer').appendChild(div);
+            updateStepNumbers();
+        }
+
+        // Función para mover el paso hacia arriba o hacia abajo
+        function moveStep(btn, direction) {
+            const currentItem = btn.closest('.step-item');
+            if (direction === 'up') {
+                const prevItem = currentItem.previousElementSibling;
+                if (prevItem) {
+                    currentItem.parentNode.insertBefore(currentItem, prevItem);
+                }
+            } else if (direction === 'down') {
+                const nextItem = currentItem.nextElementSibling;
+                if (nextItem) {
+                    currentItem.parentNode.insertBefore(nextItem, currentItem);
+                }
+            }
+            updateStepNumbers();
+        }
+
+        // Actualizar visualmente la numeración de los pasos después de moverlos o borrarlos
+        function updateStepNumbers() {
+            const steps = document.querySelectorAll('.step-item');
+            steps.forEach((step, index) => {
+                const label = step.querySelector('.step-number-label');
+                if (label) label.innerText = `Paso ${index + 1}`;
+            });
         }
 
         function handleImg(input) {
